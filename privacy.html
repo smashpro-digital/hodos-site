@@ -4,30 +4,186 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HODOS — Privacy Policy</title>
+
   <style>
-    body {
-  background: linear-gradient(180deg, #FBF7EF 0%, #F6EFE4 100%);
-}
-a {
-  color: #C58A2C;
-}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;color:#1a1a1a;background:#fbf7ef;}
-    .wrap{max-width:920px;margin:0 auto;padding:56px 18px;}
-    .card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
-    a{color:#7a4a12}
-    p,li{line-height:1.6}
-    h1{margin:0 0 10px}
+    :root{
+      --bg:#F6EFE4;
+      --bg2:#FBF7EF;
+      --card:#FFFFFF;
+      --ink:#1A1A1A;
+
+      --gold:#C58A2C;
+      --gold2:#F7D27A;
+      --gold-dark:#6B3F1D;
+      --clay:#E8D6B8;
+
+      --line: rgba(197,138,44,.18);
+      --shadow: 0 20px 46px rgba(0,0,0,.10);
+      --radius: 22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+    }
+    a{color:var(--gold); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .wrap{max-width:980px;margin:0 auto;padding:72px 18px}
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:34px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-220px -140px auto auto;
+      width:560px;
+      height:560px;
+      background: radial-gradient(circle at top, rgba(247,210,122,.55), rgba(197,138,44,.20) 45%, transparent 70%);
+      opacity:.55;
+      transform: rotate(18deg);
+      pointer-events:none;
+    }
+
+    .top{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .app-icon{
+      width:44px;height:44px;border-radius:14px;
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      border: 1px solid rgba(0,0,0,.06);
+      object-fit:cover;
+      background:var(--clay);
+    }
+    .brand h1{
+      margin:0;
+      font-size:26px;
+      letter-spacing:.6px;
+      line-height:1.1;
+    }
+    .brand .sub{
+      margin-top:2px;
+      font-weight:700;
+      color:var(--gold-dark);
+      font-size:14px;
+      opacity:.92;
+    }
+
+    .meta{
+      font-size:14px;
+      color:#5A4636;
+      opacity:.9;
+      margin: 6px 0 0;
+      text-align:right;
+    }
+
+    .back{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(232,214,184,.85);
+      color:var(--gold-dark);
+      font-weight:750;
+      border:1px solid rgba(197,138,44,.25);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .back:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0,0,0,.12);
+      text-decoration:none;
+    }
+
     h2{margin-top:26px}
-    .meta{font-size:14px;opacity:.75}
-    code{background:#f3e6d3;padding:2px 6px;border-radius:8px}
+    p,li{line-height:1.75}
+    ul{padding-left:20px}
+
+    .rule{
+      height:1px;
+      background: linear-gradient(90deg, transparent, var(--line), transparent);
+      margin: 18px 0 6px;
+    }
+
+    .callout{
+      margin-top:18px;
+      padding:14px 16px;
+      border-radius:16px;
+      background: rgba(232,214,184,.55);
+      border:1px solid rgba(197,138,44,.20);
+      color:#3A240F;
+    }
+
+    code{
+      background:#f3e6d3;
+      padding:2px 6px;
+      border-radius:8px;
+    }
+
+    footer{
+      margin-top:28px;
+      font-size:14px;
+      color:#5A4636;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    @media (max-width:560px){
+      .card{padding:24px}
+      .meta{text-align:left}
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card">
-      <p><a href="./index.html">← Back</a></p>
-      <h1>Privacy Policy</h1>
-      <p class="meta">Effective date: <strong>YYYY-MM-DD</strong></p>
+
+      <div class="top">
+        <div class="brand">
+          <img src="./assets/hodos-icon.png" alt="HODOS icon" class="app-icon" />
+          <div>
+            <h1>Privacy Policy</h1>
+            <div class="sub">One Day. One Step.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+          <a class="back" href="./index.html" aria-label="Back to HODOS home">← Back</a>
+          <div class="meta">Effective date: <strong>YYYY-MM-DD</strong></div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
 
       <p>HODOS (“we,” “us”) respects your privacy. This policy explains what we collect, how we use it, and your choices.</p>
 
@@ -58,14 +214,23 @@ a {
       <p>We use reasonable safeguards to protect data. No method of transmission or storage is 100% secure.</p>
 
       <h2>Medical Disclaimer</h2>
-      <p>HODOS is not medical advice and is not a substitute for professional care.</p>
+      <div class="callout">
+        <strong>HODOS is not medical advice</strong> and is not a substitute for professional care.
+      </div>
 
       <h2>Contact</h2>
       <p>Email: <strong>support@YOURDOMAIN</strong> (replace)</p>
 
-      <p class="meta">Last updated: YYYY-MM-DD</p>
+      <footer>
+        <div>© <span id="y"></span> HODOS</div>
+        <div>Last updated: <strong>YYYY-MM-DD</strong></div>
+      </footer>
+
     </div>
   </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
-
