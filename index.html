@@ -1,1 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HODOS — One Day. One Step.</title>
+  <meta name="description" content="HODOS — One Day. One Step. A journey toward order through daily movement and awareness." />
+  <style>
+    :root{--bg:#fbf7ef;--card:#fff;--ink:#1a1a1a;--gold:#7a4a12;--pill:#f3e6d3;}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;color:var(--ink);background:var(--bg);}
+    .wrap{max-width:920px;margin:0 auto;padding:56px 18px;}
+    .card{background:var(--card);border-radius:16px;padding:28px;box-shadow:0 6px 18px rgba(0,0,0,.06);}
+    h1{font-size:46px;margin:0 0 6px;letter-spacing:.5px}
+    h2{font-size:18px;margin:0 0 18px;font-weight:650;opacity:.85}
+    p{line-height:1.6;margin:14px 0}
+    a{color:var(--gold);text-decoration:none}
+    a:hover{text-decoration:underline}
+    nav{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
+    .pill{display:inline-block;padding:10px 14px;border-radius:999px;background:var(--pill)}
+    footer{margin-top:22px;font-size:14px;opacity:.75}
+    .mark{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+    .logo{width:56px;height:56px;border-radius:14px;background:#f3e6d3;display:grid;place-items:center;font-weight:800;color:var(--gold)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="mark">
+        <div class="logo">H</div>
+        <div>
+          <h1>HODOS</h1>
+          <h2>One Day. One Step.</h2>
+        </div>
+      </div>
 
+      <p>HODOS is a journey toward order through daily movement and awareness.</p>
+      <p><strong>Legal:</strong> These pages host HODOS privacy policy, terms, and support links for app release.</p>
+
+      <nav>
+        <a class="pill" href="./privacy.html">Privacy Policy</a>
+        <a class="pill" href="./terms.html">Terms of Service</a>
+        <a class="pill" href="./support.html">Support</a>
+      </nav>
+
+      <footer>© <span id="y"></span> HODOS</footer>
+    </div>
+  </div>
+  <script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+</body>
+</html>
