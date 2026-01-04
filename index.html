@@ -599,7 +599,7 @@ input:focus {
     }
 
     try {
-      const res = await fetch("https://smashpro.app/api/v1/waitlist", {
+        const res = await fetch("https://smashpro.app/api/v1/index.php?path=waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
