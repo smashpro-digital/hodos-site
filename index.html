@@ -8,15 +8,15 @@
 
   <style>
     :root {
-      --bg: #F6EFE4;          /* desert sand */
-      --bg2: #FBF7EF;         /* lighter sand */
+      --bg: #F6EFE4;
+      --bg2: #FBF7EF;
       --card: #FFFFFF;
       --ink: #1A1A1A;
 
-      --gold: #C58A2C;        /* solar gold */
-      --gold2: #F7D27A;       /* highlight */
-      --gold-dark: #6B3F1D;   /* stone brown */
-      --clay: #E8D6B8;        /* soft clay */
+      --gold: #C58A2C;
+      --gold2: #F7D27A;
+      --gold-dark: #6B3F1D;
+      --clay: #E8D6B8;
 
       --line: rgba(197,138,44,.18);
       --shadow: 0 20px 46px rgba(0,0,0,.10);
@@ -51,7 +51,6 @@
       border: 1px solid var(--line);
     }
 
-    /* Subtle “path” motif */
     .card::before {
       content: "";
       position: absolute;
@@ -134,9 +133,7 @@
       z-index: 1;
     }
 
-    .subtitle strong {
-      color: var(--gold-dark);
-    }
+    .subtitle strong { color: var(--gold-dark); }
 
     .divider {
       margin: 22px 0 0;
@@ -160,6 +157,8 @@
       height: 44px;
       transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
       filter: saturate(0.92);
+      width: auto;
+      display: block;
     }
 
     .badge:hover {
@@ -177,7 +176,7 @@
       z-index: 1;
     }
 
-    .cta-row {
+    .btnrow {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
@@ -189,20 +188,24 @@
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       padding: 12px 18px;
       border-radius: 999px;
-      text-decoration: none;
-      font-weight: 750;
       border: 1px solid rgba(197,138,44,.30);
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      font-weight: 750;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
       user-select: none;
+      background: transparent;
+      color: inherit;
     }
 
     .btn-primary {
-      background: radial-gradient(circle at top, var(--gold2), var(--gold));
+      background: radial-gradient(circle at top, #F7D27A, var(--gold));
       color: #3A240F;
-      box-shadow: 0 10px 24px rgba(197,138,44,.25);
+      box-shadow: 0 10px 24px rgba(197,138,44,.22);
     }
 
     .btn-primary:hover {
@@ -211,39 +214,13 @@
     }
 
     .btn-ghost {
-      background: var(--clay);
+      background: rgba(232,214,184,.85);
       color: var(--gold-dark);
     }
 
     .btn-ghost:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 18px rgba(0,0,0,.10);
-    }
-
-    nav {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: 26px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 12px 18px;
-      border-radius: 999px;
-      background: rgba(232,214,184,.85);
-      color: var(--gold-dark);
-      font-weight: 700;
-      text-decoration: none;
-      border: 1px solid rgba(197,138,44,.25);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .pill:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 16px rgba(0,0,0,.12);
     }
 
     footer {
@@ -259,171 +236,96 @@
       gap: 10px;
     }
 
-    .micro {
-      opacity: .8;
-    }
+    .micro { opacity: .8; }
 
-    /* Mobile */
     @media (max-width: 560px) {
       .card { padding: 26px; }
       h1 { font-size: 42px; }
       .app-icon { width: 60px; height: 60px; }
     }
-    /* ---- Waitlist UI ---- */
-.store-badges {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin: 18px 0 6px;
-}
 
-.badge {
-  height: 44px;
-  width: auto;
-  display: block;
-}
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 9999;
+    }
+    .modal-backdrop.open { display: flex; }
 
-.btnrow {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
+    .modal {
+      width: min(560px, 100%);
+      background: #fff;
+      border-radius: 22px;
+      border: 1px solid rgba(197,138,44,.18);
+      box-shadow: 0 22px 60px rgba(0,0,0,.22);
+      overflow: hidden;
+    }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(197,138,44,.30);
-  font-weight: 750;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
-  user-select: none;
-}
+    .modal-head {
+      padding: 18px 18px 10px;
+      background: linear-gradient(180deg, rgba(247,210,122,.35), rgba(232,214,184,.20));
+    }
 
-.btn-primary {
-  background: radial-gradient(circle at top, #F7D27A, var(--gold));
-  color: #3A240F;
-  box-shadow: 0 10px 24px rgba(197,138,44,.22);
-}
+    .modal-title { margin: 0; font-size: 20px; letter-spacing: .4px; }
+    .modal-sub { margin: 6px 0 0; color: var(--gold-dark); font-weight: 650; font-size: 14px; }
+    .modal-body { padding: 18px; }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 26px rgba(197,138,44,.30);
-}
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
 
-.btn-ghost {
-  background: rgba(232,214,184,.85);
-  color: var(--gold-dark);
-}
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 750;
+      color: #3A240F;
+      margin-bottom: 6px;
+    }
 
-.btn-ghost:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(0,0,0,.10);
-}
+    input {
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(197,138,44,.25);
+      outline: none;
+      font-size: 15px;
+      background: #fff;
+    }
 
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.45);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  z-index: 9999;
-}
+    input:focus {
+      border-color: rgba(197,138,44,.55);
+      box-shadow: 0 0 0 4px rgba(197,138,44,.14);
+    }
 
-.modal-backdrop.open { display: flex; }
+    .help {
+      font-size: 13px;
+      color: #5A4636;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
 
-.modal {
-  width: min(560px, 100%);
-  background: #fff;
-  border-radius: 22px;
-  border: 1px solid rgba(197,138,44,.18);
-  box-shadow: 0 22px 60px rgba(0,0,0,.22);
-  overflow: hidden;
-}
+    .notice {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(197,138,44,.20);
+      background: rgba(232,214,184,.45);
+      color: #3A240F;
+      display: none;
+      white-space: pre-wrap;
+    }
 
-.modal-head {
-  padding: 18px 18px 10px;
-  background: linear-gradient(180deg, rgba(247,210,122,.35), rgba(232,214,184,.20));
-}
-
-.modal-title {
-  margin: 0;
-  font-size: 20px;
-  letter-spacing: .4px;
-}
-
-.modal-sub {
-  margin: 6px 0 0;
-  color: var(--gold-dark);
-  font-weight: 650;
-  font-size: 14px;
-}
-
-.modal-body { padding: 18px; }
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 560px) {
-  .grid { grid-template-columns: 1fr; }
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 750;
-  color: #3A240F;
-  margin-bottom: 6px;
-}
-
-input {
-  width: 100%;
-  padding: 12px 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(197,138,44,.25);
-  outline: none;
-  font-size: 15px;
-  background: #fff;
-}
-
-input:focus {
-  border-color: rgba(197,138,44,.55);
-  box-shadow: 0 0 0 4px rgba(197,138,44,.14);
-}
-
-.help {
-  font-size: 13px;
-  color: #5A4636;
-  margin-top: 10px;
-  line-height: 1.5;
-}
-
-.notice {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(197,138,44,.20);
-  background: rgba(232,214,184,.45);
-  color: #3A240F;
-  display: none;
-}
-
-.notice.show { display: block; }
-.notice.ok { background: rgba(232,214,184,.55); }
-.notice.err { background: rgba(255, 150, 150, .20); border-color: rgba(190, 0, 0, .18); }
-
+    .notice.show { display: block; }
+    .notice.ok { background: rgba(232,214,184,.55); }
+    .notice.err { background: rgba(255, 150, 150, .20); border-color: rgba(190, 0, 0, .18); }
   </style>
 </head>
 
@@ -450,7 +352,6 @@ input:focus {
           <div class="divider"></div>
 
           <div class="store-row">
-            <!-- Apple: placeholder until App Store / TestFlight link exists -->
             <a href="https://smashpro-digital.github.io/hodos-site/"
                target="_blank" rel="noopener noreferrer"
                aria-label="Apple App Store (Coming Soon)">
@@ -467,167 +368,193 @@ input:focus {
           <div class="availability">Available soon on iOS and Android.</div>
 
           <div class="btnrow">
-  <button class="btn btn-primary" id="joinBtn" type="button">Join the Walk</button>
-  <a class="btn btn-ghost" href="./privacy.html">Privacy</a>
-  <a class="btn btn-ghost" href="./terms.html">Terms</a>
-  <a class="btn btn-ghost" href="./support.html">Support</a>
-</div>
-
+            <button class="btn btn-primary" id="joinBtn" type="button">Join the Walk</button>
+            <a class="btn btn-ghost" href="./privacy.html">Privacy</a>
+            <a class="btn btn-ghost" href="./terms.html">Terms</a>
+            <a class="btn btn-ghost" href="./support.html">Support</a>
+          </div>
 
           <footer>
             <div>© <span id="y"></span> HODOS</div>
-            <div class="micro">Built by <a href="https://dashboard.smashpro.app" target="_blank">SmashPro Digital</a></div>
+            <div class="micro">Built by <a href="https://dashboard.smashpro.app" target="_blank" rel="noopener noreferrer">SmashPro Digital</a></div>
           </footer>
         </div>
       </div>
     </div>
   </div>
-<!-- Waitlist Modal -->
-<div class="modal-backdrop" id="waitlistModal" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="waitlistTitle">
-    <div class="modal-head">
-      <h3 class="modal-title" id="waitlistTitle">Join the Walk</h3>
-      <p class="modal-sub">One Day. One Step.</p>
-    </div>
 
-    <div class="modal-body">
-      <form id="waitlistForm">
-        <!-- Honeypot (hidden) -->
-        <input type="text" name="company" id="company" autocomplete="off" tabindex="-1"
-               style="position:absolute; left:-9999px; opacity:0;" />
+  <!-- Waitlist Modal -->
+  <div class="modal-backdrop" id="waitlistModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="waitlistTitle">
+      <div class="modal-head">
+        <h3 class="modal-title" id="waitlistTitle">Join the Walk</h3>
+        <p class="modal-sub">One Day. One Step.</p>
+      </div>
 
-        <div class="grid">
-          <div>
-            <label for="first_name">First name</label>
-            <input id="first_name" name="first_name" type="text" placeholder="Maurice" />
+      <div class="modal-body">
+        <form id="waitlistForm">
+          <!-- Honeypot -->
+          <input type="text" name="company" id="company" autocomplete="off" tabindex="-1"
+                 style="position:absolute; left:-9999px; opacity:0;" />
+
+          <div class="grid">
+            <div>
+              <label for="first_name">First name</label>
+              <input id="first_name" name="first_name" type="text" placeholder="Maurice" />
+            </div>
+
+            <div>
+              <label for="last_name">Last name</label>
+              <input id="last_name" name="last_name" type="text" placeholder="Jordan" />
+            </div>
           </div>
 
-          <div>
-            <label for="last_name">Last name</label>
-            <input id="last_name" name="last_name" type="text" placeholder="Jordan" />
+          <div style="margin-top:12px;">
+            <label for="email">Email (required)</label>
+            <input id="email" name="email" type="email" required placeholder="you@email.com" />
           </div>
-        </div>
 
-        <div style="margin-top:12px;">
-          <label for="email">Email (required)</label>
-          <input id="email" name="email" type="email" required placeholder="you@email.com" />
-        </div>
+          <div style="margin-top:12px;">
+            <label for="phone">Phone (optional)</label>
+            <input id="phone" name="phone" type="tel" placeholder="803-555-1234" />
+          </div>
 
-        <div style="margin-top:12px;">
-          <label for="phone">Phone (optional)</label>
-          <input id="phone" name="phone" type="tel" placeholder="803-555-1234" />
-        </div>
+          <div class="help">
+            By joining, you’ll get early access updates. No spam. No selling data.
+          </div>
 
-        <div class="help">
-          By joining, you’ll get early access updates. No spam. No selling data.
-        </div>
+          <div class="notice" id="notice"></div>
 
-        <div class="notice" id="notice"></div>
-
-        <div class="btnrow" style="margin-top:16px;">
-          <button class="btn btn-primary" id="submitBtn" type="submit">Join Waitlist</button>
-          <button class="btn btn-ghost" id="closeBtn" type="button">Not yet</button>
-        </div>
-      </form>
+          <div class="btnrow" style="margin-top:16px;">
+            <button class="btn btn-primary" id="submitBtn" type="submit">Join Waitlist</button>
+            <button class="btn btn-ghost" id="closeBtn" type="button">Not yet</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
- <script>
-  // Year
-  document.getElementById("y").textContent = new Date().getFullYear();
+  <script>
+    // Year
+    document.getElementById("y").textContent = new Date().getFullYear();
 
-  // Modal helpers
-  const modal = document.getElementById("waitlistModal");
-  const joinBtn = document.getElementById("joinBtn");
-  const closeBtn = document.getElementById("closeBtn");
-  const form = document.getElementById("waitlistForm");
-  const notice = document.getElementById("notice");
-  const submitBtn = document.getElementById("submitBtn");
+    // API endpoint (working path-based route)
+    const WAITLIST_ENDPOINT = "https://smashpro.app/api/v1/index.php?path=waitlist";
 
-  function openModal() {
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-    notice.className = "notice";
-    notice.textContent = "";
-    document.getElementById("email").focus();
-  }
+    // Modal helpers
+    const modal = document.getElementById("waitlistModal");
+    const joinBtn = document.getElementById("joinBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const form = document.getElementById("waitlistForm");
+    const notice = document.getElementById("notice");
+    const submitBtn = document.getElementById("submitBtn");
 
-  function closeModal() {
-    modal.classList.remove("open");
-    modal.setAttribute("aria-hidden", "true");
-  }
-
-  joinBtn?.addEventListener("click", openModal);
-  closeBtn?.addEventListener("click", closeModal);
-
-  // Close when clicking outside
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  // Close on ESC
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
-  });
-
-  // Submit to SmashPro API
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    notice.className = "notice";
-    notice.textContent = "";
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Joining...";
-
-    const payload = {
-      app_slug: "hodos",
-      email: (document.getElementById("email").value || "").trim(),
-      first_name: (document.getElementById("first_name").value || "").trim(),
-      last_name: (document.getElementById("last_name").value || "").trim(),
-      phone: (document.getElementById("phone").value || "").trim(),
-      source: "hodos-site",
-      company: (document.getElementById("company").value || "").trim() // honeypot
-    };
-
-    if (!payload.email) {
-      notice.className = "notice err show";
-      notice.textContent = "Email is required.";
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Join Waitlist";
-      return;
+    function setNotice(type, msg) {
+      notice.className = "notice show " + (type === "ok" ? "ok" : "err");
+      notice.textContent = msg || "";
     }
 
-    try {
-        const res = await fetch("https://smashpro.app/api/v1/index.php?path=waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+    function clearNotice() {
+      notice.className = "notice";
+      notice.textContent = "";
+    }
 
-      const data = await res.json().catch(() => ({}));
+    function openModal() {
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      clearNotice();
+      setTimeout(() => document.getElementById("email").focus(), 0);
+    }
 
-      if (!res.ok || data.ok === false) {
-        throw new Error(data.error || "Unable to join right now.");
+    function closeModal() {
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    joinBtn?.addEventListener("click", openModal);
+    closeBtn?.addEventListener("click", closeModal);
+
+    // Close when clicking outside
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Close on ESC
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+    });
+
+    async function safeReadBody(res) {
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+      if (ct.includes("application/json")) {
+        return await res.json().catch(() => ({}));
+      }
+      // fallback: try text
+      const text = await res.text().catch(() => "");
+      return { _text: text };
+    }
+
+    // Submit to SmashPro API
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      clearNotice();
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Joining...";
+
+      const payload = {
+        app_slug: "hodos",
+        email: (document.getElementById("email").value || "").trim(),
+        first_name: (document.getElementById("first_name").value || "").trim(),
+        last_name: (document.getElementById("last_name").value || "").trim(),
+        phone: (document.getElementById("phone").value || "").trim(),
+        source: "hodos-site",
+        company: (document.getElementById("company").value || "").trim() // honeypot
+      };
+
+      if (!payload.email) {
+        setNotice("err", "Email is required.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Join Waitlist";
+        return;
       }
 
-      notice.className = "notice ok show";
-      notice.textContent = "You’re on the list. One Day. One Step. ✅";
+      try {
+        const res = await fetch(WAITLIST_ENDPOINT, {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
 
-      form.reset();
-      document.getElementById("company").value = "";
+        const data = await safeReadBody(res);
 
-      setTimeout(() => closeModal(), 1100);
+        // Normalize error display
+        if (!res.ok || data.ok === false) {
+          const msg =
+            data.error ||
+            data.message ||
+            (data._text ? "Server returned an error." : "") ||
+            `Request failed (${res.status})`;
+          throw new Error(msg);
+        }
 
-    } catch (err) {
-      notice.className = "notice err show";
-      notice.textContent = (err && err.message) ? err.message : "Something went wrong.";
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Join Waitlist";
-    }
-  });
-</script>
+        setNotice("ok", "You’re on the list. One Day. One Step. ✅");
 
+        form.reset();
+        document.getElementById("company").value = "";
+
+        setTimeout(() => closeModal(), 900);
+      } catch (err) {
+        setNotice("err", (err && err.message) ? err.message : "Something went wrong.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Join Waitlist";
+      }
+    });
+  </script>
 </body>
 </html>
