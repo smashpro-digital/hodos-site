@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HODOS Admin — Quests & Assets</title>
+  <meta name="description" content="HODOS Admin: manage quests, releases, and asset jobs queue (GitHub-authenticated)." />
+
   <style>
     :root{
       --bg:#F6EFE4; --bg2:#FBF7EF; --card:#fff; --ink:#1A1A1A;
@@ -13,20 +15,41 @@
       --serif: ui-serif, Georgia, "Times New Roman", Times, serif;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
-      background: radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
-                  radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
-                  linear-gradient(180deg,var(--bg2),var(--bg));
+    body{
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
+        linear-gradient(180deg,var(--bg2),var(--bg));
       min-height:100vh;
     }
     .wrap{max-width:1200px;margin:0 auto;padding:34px 16px 60px}
     .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     h1{margin:0;font-family:var(--serif);color:var(--gold-dark);letter-spacing:.2px}
-    .card{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+    .card{
+      background:rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      padding:16px
+    }
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{border:1px solid rgba(197,138,44,.32);background:rgba(255,255,255,.75);border-radius:999px;padding:10px 12px;font-weight:800;cursor:pointer}
+    .btn{
+      border:1px solid rgba(197,138,44,.32);
+      background:rgba(255,255,255,.75);
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 18px rgba(0,0,0,.10)}
+    .btn:disabled{opacity:.6; cursor:not-allowed; transform:none; box-shadow:none}
     .btn.primary{background:radial-gradient(circle at top,var(--gold2),var(--gold));color:#3A240F}
-    .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;
+      border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800
+    }
     .grid{display:grid;grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px}
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     table{width:100%;border-collapse:collapse}
@@ -40,10 +63,23 @@
     @media(max-width:720px){.two{grid-template-columns:1fr}}
     .hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
     .mini{font-size:12px;color:rgba(58,36,15,.78)}
-    .ok{color:#1b5e20;font-weight:800}
-    .err{color:#8b0000;font-weight:800}
+    .ok{color:#1b5e20;font-weight:900}
+    .err{color:#8b0000;font-weight:900}
+    .warn{color:#6B3F1D;font-weight:900}
+    .stickyActions{position:sticky; right:0; background:rgba(255,255,255,.86); backdrop-filter: blur(4px)}
+    .kbd{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(197,138,44,.18);
+      background:rgba(232,214,184,.55);
+      display:inline-block;
+      margin-left:6px;
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
@@ -53,13 +89,14 @@
       </div>
       <div class="row">
         <span class="pill" id="who">Checking session…</span>
-        <button class="btn" id="loginBtn">Login with GitHub</button>
-        <button class="btn" id="logoutBtn">Logout</button>
-        <button class="btn primary" id="reloadBtn">Reload</button>
+        <button class="btn" id="loginBtn" type="button">Login with GitHub</button>
+        <button class="btn" id="logoutBtn" type="button">Logout</button>
+        <button class="btn primary" id="reloadBtn" type="button">Reload</button>
       </div>
     </div>
 
     <div class="grid">
+      <!-- LEFT: QUESTS -->
       <div class="card">
         <div class="row" style="justify-content:space-between;">
           <div class="pill">Quests</div>
@@ -67,13 +104,14 @@
             <select id="appSlug" style="max-width:220px;">
               <option value="hodos">hodos</option>
             </select>
-            <button class="btn" id="loadQuestsBtn">Load quests</button>
+            <button class="btn" id="loadQuestsBtn" type="button">Load quests</button>
           </div>
         </div>
 
         <div class="hr"></div>
 
         <div id="questState" class="muted">No data loaded yet.</div>
+
         <div style="overflow:auto;">
           <table id="questTable" style="display:none;">
             <thead>
@@ -83,33 +121,40 @@
                 <th>Published</th>
                 <th>Release</th>
                 <th>Hero Image</th>
-                <th>Actions</th>
+                <th class="stickyActions">Actions</th>
               </tr>
             </thead>
             <tbody id="questTbody"></tbody>
           </table>
         </div>
+
+        <div class="mini muted" style="margin-top:10px;">
+          Tip: “Hero Image” should be a site path like <span class="kbd">assets/quests/returning_light.jpg</span>.
+          Your quest tiles (public pages) can read this and render real scenes per quest_code.
+        </div>
       </div>
 
+      <!-- RIGHT: JOBS -->
       <div class="card">
-        <div class="pill">Asset Jobs</div>
-        <div class="hr"></div>
-
         <div class="row" style="justify-content:space-between;">
-          <select id="jobStatus" style="max-width:220px;">
-            <option value="active">active</option>
-            <option value="queued">queued</option>
-            <option value="in_progress">in_progress</option>
-            <option value="done">done</option>
-            <option value="failed">failed</option>
-            <option value="all">all</option>
-          </select>
-          <button class="btn" id="loadJobsBtn">Load jobs</button>
+          <div class="pill">Asset Jobs</div>
+          <div class="row">
+            <select id="jobStatus" style="max-width:220px;">
+              <option value="active">active</option>
+              <option value="queued">queued</option>
+              <option value="in_progress">in_progress</option>
+              <option value="done">done</option>
+              <option value="failed">failed</option>
+              <option value="all">all</option>
+            </select>
+            <button class="btn" id="loadJobsBtn" type="button">Load jobs</button>
+          </div>
         </div>
 
         <div class="hr"></div>
 
         <div id="jobState" class="muted">No jobs loaded yet.</div>
+
         <div style="overflow:auto; max-height:520px;">
           <table id="jobTable" style="display:none;">
             <thead>
@@ -124,6 +169,12 @@
             <tbody id="jobTbody"></tbody>
           </table>
         </div>
+
+        <div class="mini muted" style="margin-top:10px;">
+          Note: If you see <span class="warn">CORS error</span> in DevTools but HTTP 200, your API is returning
+          without <span class="kbd">Access-Control-Allow-Origin</span> or without
+          <span class="kbd">Access-Control-Allow-Credentials</span>. Fix in server: admin_cors.php + SameSite=None cookie.
+        </div>
       </div>
     </div>
   </div>
@@ -131,7 +182,6 @@
 <script>
   // ---------- CONFIG ----------
   const API_BASE = "https://smashpro.app/api/v1/admin";
-  const UI_REDIRECT = location.href; // after callback, you land here
 
   // Endpoints
   const EP = {
@@ -165,55 +215,95 @@
 
   let SESSION = null;
 
-  function esc(s){ return String(s ?? "").replace(/[&<>"]/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+  function esc(s){
+    return String(s ?? "").replace(/[&<>"]/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"
+    }[c]));
+  }
 
   async function jget(url){
-    const r = await fetch(url, { credentials: "include" });
+    const r = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+      headers: { "Accept": "application/json" }
+    });
     const ct = (r.headers.get("content-type")||"").toLowerCase();
     const data = ct.includes("application/json") ? await r.json() : { _text: await r.text() };
-    if (!r.ok || data.ok === false) throw new Error(data.error || data.message || `HTTP ${r.status}`);
+    if (!r.ok || data.ok === false) {
+      const extra = data._text ? `\n\n[non-JSON body]\n${String(data._text).slice(0, 400)}` : "";
+      throw new Error((data.error || data.message || `HTTP ${r.status}`) + extra);
+    }
     return data;
   }
 
   async function jpost(url, body){
     const r = await fetch(url, {
-      method:"POST",
-      credentials:"include",
-      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+      headers: { "Content-Type":"application/json", "Accept":"application/json" },
       body: JSON.stringify(body || {})
     });
     const ct = (r.headers.get("content-type")||"").toLowerCase();
     const data = ct.includes("application/json") ? await r.json() : { _text: await r.text() };
-    if (!r.ok || data.ok === false) throw new Error(data.error || data.message || `HTTP ${r.status}`);
+    if (!r.ok || data.ok === false) {
+      const extra = data._text ? `\n\n[non-JSON body]\n${String(data._text).slice(0, 400)}` : "";
+      throw new Error((data.error || data.message || `HTTP ${r.status}`) + extra);
+    }
     return data;
   }
 
-  async function refreshSession(){
-    const s = await jget(EP.sessionGet);
-    SESSION = s.authenticated ? s.admin : null;
-    if (SESSION) {
-      who.innerHTML = `✅ <strong>${esc(SESSION.login)}</strong>`;
+  function setWho(kind, htmlOrText){
+    if (kind === "ok") {
       who.className = "pill ok";
-    } else {
-      who.textContent = "Not logged in";
-      who.className = "pill muted";
+      who.innerHTML = htmlOrText;
+      return;
+    }
+    if (kind === "err") {
+      who.className = "pill err";
+      who.textContent = htmlOrText;
+      return;
+    }
+    who.className = "pill muted";
+    who.textContent = htmlOrText;
+  }
+
+  async function refreshSession(){
+    try{
+      const s = await jget(EP.sessionGet);
+      SESSION = s.authenticated ? s.admin : null;
+
+      if (SESSION) {
+        setWho("ok", `✅ <strong>${esc(SESSION.login || "admin")}</strong>`);
+      } else {
+        setWho("muted", "Not logged in");
+      }
+    } catch (e) {
+      // If CORS is broken, this will land here.
+      SESSION = null;
+      setWho("err", "Session check failed (CORS?)");
+      console.error(e);
     }
   }
 
   async function login(){
     const r = await jget(EP.startAuth);
     if (!r.auth_url) throw new Error("Missing auth_url");
-    // Redirect to GitHub OAuth
     location.href = r.auth_url;
   }
 
   async function logout(){
     await jget(EP.logout);
     await refreshSession();
+    questTable.style.display = "none";
+    jobTable.style.display = "none";
+    questState.textContent = "Logged out.";
+    jobState.textContent = "Logged out.";
   }
 
   function questRow(q){
-    const published = (q.is_published == 1 || q.is_published === true) ? "1" : "0";
+    const published = (q.is_published == 1 || q.is_published === true || q.is_published === "1") ? "1" : "0";
     const rel = q.target_release_date || "";
     const hero = q.hero_image || "";
     return `
@@ -222,17 +312,17 @@
         <td><input data-k="title" value="${esc(q.title||"")}" /></td>
         <td>
           <select data-k="is_published">
-            <option value="0" ${published==="0"?"selected":""}>0</option>
-            <option value="1" ${published==="1"?"selected":""}>1</option>
+            <option value="0" ${published==="0" ? "selected" : ""}>0</option>
+            <option value="1" ${published==="1" ? "selected" : ""}>1</option>
           </select>
         </td>
         <td><input data-k="target_release_date" placeholder="YYYY-MM-DD" value="${esc(rel)}" /></td>
         <td><input data-k="hero_image" placeholder="assets/quests/<code>.jpg" value="${esc(hero)}" /></td>
-        <td>
+        <td class="stickyActions">
           <div class="row">
-            <button class="btn" data-action="save">Save</button>
-            <button class="btn" data-action="prompt">Gen Prompt</button>
-            <button class="btn primary" data-action="queue">Queue Tile Job</button>
+            <button class="btn" data-action="save" type="button">Save</button>
+            <button class="btn" data-action="prompt" type="button">Gen Prompt</button>
+            <button class="btn primary" data-action="queue" type="button">Queue Tile Job</button>
           </div>
         </td>
       </tr>
@@ -240,6 +330,11 @@
   }
 
   async function loadQuests(){
+    if (!SESSION) {
+      questState.textContent = "Login required.";
+      return;
+    }
+
     questState.textContent = "Loading quests…";
     questTable.style.display = "none";
     questTbody.innerHTML = "";
@@ -251,12 +346,18 @@
       questState.textContent = "No quests returned.";
       return;
     }
+
     questState.textContent = "";
     questTable.style.display = "";
     questTbody.innerHTML = quests.map(questRow).join("");
   }
 
   async function loadJobs(){
+    if (!SESSION) {
+      jobState.textContent = "Login required.";
+      return;
+    }
+
     jobState.textContent = "Loading jobs…";
     jobTable.style.display = "none";
     jobTbody.innerHTML = "";
@@ -269,6 +370,7 @@
       jobState.textContent = "No jobs found for this filter.";
       return;
     }
+
     jobState.textContent = "";
     jobTable.style.display = "";
     jobTbody.innerHTML = jobs.map(j => `
@@ -282,7 +384,7 @@
     `).join("");
   }
 
-  // Table event delegation
+  // Table event delegation (Quests)
   questTbody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
@@ -297,12 +399,15 @@
     const fields = {};
     tr.querySelectorAll("[data-k]").forEach(el => fields[el.dataset.k] = el.value);
 
+    const originalText = btn.textContent;
+
     try {
       btn.disabled = true;
+
       if (action === "save") {
         await jpost(EP.questsUpdate, { id, ...fields });
         btn.textContent = "Saved ✅";
-        setTimeout(()=>btn.textContent="Save", 900);
+        setTimeout(() => (btn.textContent = originalText), 900);
       }
 
       if (action === "prompt") {
@@ -310,7 +415,7 @@
           quest_code: code,
           title: fields.title || ""
         });
-        window.prompt("Quest Tile Prompt (copy):", promptRes.prompt);
+        window.prompt("Quest Tile Prompt (copy):", promptRes.prompt || "");
       }
 
       if (action === "queue") {
@@ -329,19 +434,22 @@
         });
 
         btn.textContent = "Queued ✅";
-        setTimeout(()=>btn.textContent="Queue Tile Job", 900);
+        setTimeout(() => (btn.textContent = originalText), 900);
         await loadJobs();
       }
     } catch (err) {
       console.error(err);
       alert(err?.message || "Action failed");
+      btn.textContent = originalText;
     } finally {
       btn.disabled = false;
     }
   });
 
+  // Buttons
   loginBtn.addEventListener("click", () => login().catch(err => alert(err.message)));
   logoutBtn.addEventListener("click", () => logout().catch(err => alert(err.message)));
+
   reloadBtn.addEventListener("click", async () => {
     await refreshSession();
     if (SESSION) {
