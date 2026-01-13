@@ -11,7 +11,7 @@ The site is deployed via **GitHub Pages** and serves as the canonical URL for:
 - App availability and release status
 
 ---
-<img width="1536" height="1024" alt="ChatGPT Image Jan 13, 2026, 12_51_43 PM" src="https://github.com/user-attachments/assets/0b8fa61d-96c1-4fd1-9a94-201ad4e91046" />
+<img width="1352" height="903" alt="hodos_marketing-site" src="https://github.com/user-attachments/assets/be5baf97-e6dc-4ea7-b221-a8aa5325f25f" />
 
 ## 🌍 Live Site
 
