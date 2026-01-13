@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -250,6 +249,7 @@
       flex-direction: column;
     }
 
+    /* ✅ UPDATED: hero now supports images */
     .hero {
       position: relative;
       height: 148px;
@@ -257,6 +257,28 @@
         radial-gradient(900px 260px at 20% 10%, rgba(247,210,122,.55), transparent 55%),
         radial-gradient(800px 260px at 80% 0%, rgba(197,138,44,.30), transparent 62%),
         linear-gradient(135deg, rgba(232,214,184,.78), rgba(255,255,255,.66));
+    }
+
+    .hero img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .92;
+      transform: scale(1.02);
+      filter: saturate(.98) contrast(1.05);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.02) 55%, rgba(255,255,255,.32) 100%),
+        radial-gradient(900px 220px at 15% 0%, rgba(247,210,122,.22), transparent 55%),
+        radial-gradient(900px 260px at 85% 0%, rgba(197,138,44,.20), transparent 62%);
+      pointer-events: none;
     }
 
     .pill {
@@ -275,6 +297,7 @@
       box-shadow: 0 10px 18px rgba(0,0,0,.10);
       text-transform: uppercase;
       white-space: nowrap;
+      z-index: 2;
     }
 
     .pill.easy { background: rgba(46,125,50,.88); color: #fff; }
@@ -294,6 +317,7 @@
       background: rgba(197,138,44,.22);
       border: 1px solid rgba(197,138,44,.30);
       box-shadow: 0 10px 18px rgba(0,0,0,.10);
+      z-index: 2;
     }
 
     .lock svg { width: 18px; height: 18px; fill: #6B3F1D; opacity: .95; }
@@ -378,6 +402,7 @@
       color: #3A240F;
       position: relative;
       z-index: 1;
+      white-space: pre-wrap;
     }
 
     .error { border-color: rgba(190,0,0,.18); background: rgba(255,150,150,.12); }
@@ -405,6 +430,7 @@
       border: 1px solid rgba(197,138,44,.18);
       padding: 2px 6px;
       border-radius: 8px;
+      word-break: break-all;
     }
   </style>
 </head>
@@ -469,6 +495,21 @@
     // --- Config ---
     const APP_SLUG = "hodos";
     const ENDPOINT = "https://smashpro.app/api/public/quest/index.php";
+
+    // Images (repo paths)
+    // Put your quest images here:
+    //   /assets/quests/<quest_code>.jpg
+    // Fallback lives at:
+    //   /assets/quests/fallback.jpg
+    const QUEST_IMG_BASE = "./assets/quests/";
+    const FALLBACK_IMG = QUEST_IMG_BASE + "fallback.jpg";
+
+    // Optional: explicit overrides for certain codes (nice for special cases)
+    const QUEST_IMAGE_MAP = {
+      "returning_light": QUEST_IMG_BASE + "returning_light.jpg",
+      "the_long_return": QUEST_IMG_BASE + "the_long_return.jpg",
+      "shimesh_oath": QUEST_IMG_BASE + "shimesh_oath.jpg",
+    };
 
     // UI
     const gridEl = document.getElementById("grid");
@@ -546,6 +587,20 @@
       }[c]));
     }
 
+    function normalizeCode(q) {
+      // prefer normalized "code" added by API; fall back to quest_code
+      return String(q.code || q.quest_code || "").trim();
+    }
+
+    function pickHeroImage(q) {
+      const code = normalizeCode(q);
+      if (code && QUEST_IMAGE_MAP[code]) return QUEST_IMAGE_MAP[code];
+
+      // default convention: /assets/quests/<code>.jpg
+      if (code) return QUEST_IMG_BASE + encodeURIComponent(code) + ".jpg";
+      return FALLBACK_IMG;
+    }
+
     function makeQuestCard(q) {
       const title = safeText(q.title || q.quest_title || q.quest_code || "Quest");
       const diff = safeText(q.difficulty || "easy");
@@ -574,9 +629,18 @@
 
       const health = healthBits.length ? healthBits.join(" • ") : "ready";
 
+      const code = normalizeCode(q);
+      const heroSrc = pickHeroImage(q);
+
       return `
         <div class="quest-card" role="article" aria-label="${title}">
           <div class="hero">
+            <img
+              src="${safeText(heroSrc)}"
+              alt=""
+              loading="lazy"
+              onerror="this.onerror=null; this.src='${safeText(FALLBACK_IMG)}';"
+            />
             <div class="pill ${pillCls}">${pillText}</div>
             <div class="lock" title="Premium details locked" aria-label="Premium details locked">${iconLock()}</div>
           </div>
@@ -589,7 +653,7 @@
             </div>
 
             <div class="submeta">
-              <span><strong>Code:</strong> ${safeText(q.code || q.quest_code || "")}</span>
+              <span><strong>Code:</strong> ${safeText(code)}</span>
               <span class="dot" aria-hidden="true"></span>
               <span><strong>Status:</strong> ${isComing ? "coming soon" : "available"}</span>
               <span class="dot" aria-hidden="true"></span>
@@ -690,7 +754,6 @@
         copyLinkBtn.textContent = "Copied ✅";
         setTimeout(() => (copyLinkBtn.textContent = "Copy link"), 900);
       } catch {
-        // fallback: prompt
         window.prompt("Copy link:", u.toString());
       }
     });
