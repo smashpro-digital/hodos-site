@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HODOS Admin — Quests & Assets</title>
-  <meta name="description" content="HODOS Admin: manage quests, releases, and asset jobs queue (GitHub-authenticated)." />
+  <meta name="description" content="HODOS Admin: quests, releases, and asset jobs queue (GitHub-authenticated)." />
 
   <style>
     :root{
@@ -15,8 +15,7 @@
       --serif: ui-serif, Georgia, "Times New Roman", Times, serif;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
       background:
         radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
         radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
@@ -26,13 +25,7 @@
     .wrap{max-width:1200px;margin:0 auto;padding:34px 16px 60px}
     .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     h1{margin:0;font-family:var(--serif);color:var(--gold-dark);letter-spacing:.2px}
-    .card{
-      background:rgba(255,255,255,.85);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      padding:16px
-    }
+    .card{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{
       border:1px solid rgba(197,138,44,.32);
@@ -42,9 +35,10 @@
       font-weight:800;
       cursor:pointer;
       transition: transform .12s ease, box-shadow .12s ease;
+      user-select:none;
     }
-    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 18px rgba(0,0,0,.10)}
-    .btn:disabled{opacity:.6; cursor:not-allowed; transform:none; box-shadow:none}
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.10); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
     .btn.primary{background:radial-gradient(circle at top,var(--gold2),var(--gold));color:#3A240F}
     .pill{
       display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;
@@ -65,21 +59,20 @@
     .mini{font-size:12px;color:rgba(58,36,15,.78)}
     .ok{color:#1b5e20;font-weight:900}
     .err{color:#8b0000;font-weight:900}
-    .warn{color:#6B3F1D;font-weight:900}
-    .stickyActions{position:sticky; right:0; background:rgba(255,255,255,.86); backdrop-filter: blur(4px)}
-    .kbd{
-      font-family:var(--mono);
-      font-size:12px;
-      padding:2px 6px;
-      border-radius:8px;
+    .tip{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
       border:1px solid rgba(197,138,44,.18);
-      background:rgba(232,214,184,.55);
-      display:inline-block;
-      margin-left:6px;
+      background: rgba(255,255,255,.70);
+      font-size:13px;
+      color: rgba(58,36,15,.88);
+      line-height:1.45;
     }
+    .kbd{font-family:var(--mono);font-size:12px;background:rgba(232,214,184,.55);border:1px solid rgba(197,138,44,.18);padding:2px 6px;border-radius:8px}
+    .rightcol-note{margin-top:10px}
   </style>
 </head>
-
 <body>
   <div class="wrap">
     <div class="top">
@@ -112,7 +105,12 @@
 
         <div id="questState" class="muted">No data loaded yet.</div>
 
-        <div style="overflow:auto;">
+        <div class="tip">
+          Tip: <span class="kbd">Hero Image</span> should be a site path like
+          <span class="kbd">assets/quests/returning_light.jpg</span>. Your public quest tiles can read this and render a real scene per <span class="kbd">quest_code</span>.
+        </div>
+
+        <div style="overflow:auto; margin-top:10px;">
           <table id="questTable" style="display:none;">
             <thead>
               <tr>
@@ -121,16 +119,11 @@
                 <th>Published</th>
                 <th>Release</th>
                 <th>Hero Image</th>
-                <th class="stickyActions">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="questTbody"></tbody>
           </table>
-        </div>
-
-        <div class="mini muted" style="margin-top:10px;">
-          Tip: “Hero Image” should be a site path like <span class="kbd">assets/quests/returning_light.jpg</span>.
-          Your quest tiles (public pages) can read this and render real scenes per quest_code.
         </div>
       </div>
 
@@ -155,7 +148,13 @@
 
         <div id="jobState" class="muted">No jobs loaded yet.</div>
 
-        <div style="overflow:auto; max-height:520px;">
+        <div class="tip rightcol-note">
+          Note: If DevTools shows <span class="kbd">CORS error</span> but your server logs show HTTP 200,
+          your API likely isn’t returning <span class="kbd">Access-Control-Allow-Origin</span> and
+          <span class="kbd">Access-Control-Allow-Credentials</span> for credentialed requests.
+        </div>
+
+        <div style="overflow:auto; max-height:520px; margin-top:10px;">
           <table id="jobTable" style="display:none;">
             <thead>
               <tr>
@@ -169,12 +168,6 @@
             <tbody id="jobTbody"></tbody>
           </table>
         </div>
-
-        <div class="mini muted" style="margin-top:10px;">
-          Note: If you see <span class="warn">CORS error</span> in DevTools but HTTP 200, your API is returning
-          without <span class="kbd">Access-Control-Allow-Origin</span> or without
-          <span class="kbd">Access-Control-Allow-Credentials</span>. Fix in server: admin_cors.php + SameSite=None cookie.
-        </div>
       </div>
     </div>
   </div>
@@ -183,15 +176,17 @@
   // ---------- CONFIG ----------
   const API_BASE = "https://smashpro.app/api/v1/admin";
 
-  // Endpoints
   const EP = {
     startAuth: `${API_BASE}/github/start.php`,
     sessionGet: `${API_BASE}/session/get.php`,
     logout: `${API_BASE}/session/logout.php`,
+
     questsList: `${API_BASE}/quests/list.php`,
     questsUpdate: `${API_BASE}/quests/update.php`,
+
     jobsList: `${API_BASE}/jobs/list.php`,
     jobsCreate: `${API_BASE}/jobs/create.php`,
+
     promptsQuestTile: `${API_BASE}/prompts/quest_tile.php`,
   };
 
@@ -221,104 +216,112 @@
     }[c]));
   }
 
+  // Better error text for CORS / network failures
+  function explainFetchError(err){
+    const msg = String(err?.message || err || "");
+    // Most browsers throw TypeError: Failed to fetch for CORS/network
+    if (/Failed to fetch/i.test(msg) || /NetworkError/i.test(msg)) {
+      return [
+        "Request failed (network/CORS).",
+        "If this is GitHub Pages → smashpro.app, make sure your API returns:",
+        "  - Access-Control-Allow-Origin: https://smashpro-digital.github.io",
+        "  - Access-Control-Allow-Credentials: true",
+        "and does NOT use '*' when credentials are included."
+      ].join("\n");
+    }
+    return msg || "Request failed.";
+  }
+
+  async function safeParse(res){
+    const ct = (res.headers.get("content-type") || "").toLowerCase();
+    if (ct.includes("application/json")) return await res.json().catch(() => ({}));
+    const text = await res.text().catch(() => "");
+    return { _text: text };
+  }
+
   async function jget(url){
-    const r = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      credentials: "include",
-      headers: { "Accept": "application/json" }
-    });
-    const ct = (r.headers.get("content-type")||"").toLowerCase();
-    const data = ct.includes("application/json") ? await r.json() : { _text: await r.text() };
+    let r;
+    try {
+      r = await fetch(url, { credentials: "include" });
+    } catch (err) {
+      throw new Error(explainFetchError(err));
+    }
+    const data = await safeParse(r);
+
     if (!r.ok || data.ok === false) {
-      const extra = data._text ? `\n\n[non-JSON body]\n${String(data._text).slice(0, 400)}` : "";
-      throw new Error((data.error || data.message || `HTTP ${r.status}`) + extra);
+      const msg = data.error || data.message || (data._text ? String(data._text).slice(0,180) : "") || `HTTP ${r.status}`;
+      throw new Error(msg);
     }
     return data;
   }
 
   async function jpost(url, body){
-    const r = await fetch(url, {
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
-      headers: { "Content-Type":"application/json", "Accept":"application/json" },
-      body: JSON.stringify(body || {})
-    });
-    const ct = (r.headers.get("content-type")||"").toLowerCase();
-    const data = ct.includes("application/json") ? await r.json() : { _text: await r.text() };
+    let r;
+    try {
+      r = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(body || {})
+      });
+    } catch (err) {
+      throw new Error(explainFetchError(err));
+    }
+    const data = await safeParse(r);
+
     if (!r.ok || data.ok === false) {
-      const extra = data._text ? `\n\n[non-JSON body]\n${String(data._text).slice(0, 400)}` : "";
-      throw new Error((data.error || data.message || `HTTP ${r.status}`) + extra);
+      const msg = data.error || data.message || (data._text ? String(data._text).slice(0,180) : "") || `HTTP ${r.status}`;
+      throw new Error(msg);
     }
     return data;
   }
 
-  function setWho(kind, htmlOrText){
-    if (kind === "ok") {
-      who.className = "pill ok";
-      who.innerHTML = htmlOrText;
-      return;
-    }
-    if (kind === "err") {
-      who.className = "pill err";
-      who.textContent = htmlOrText;
-      return;
-    }
-    who.className = "pill muted";
-    who.textContent = htmlOrText;
-  }
-
   async function refreshSession(){
-    try{
-      const s = await jget(EP.sessionGet);
-      SESSION = s.authenticated ? s.admin : null;
+    const s = await jget(EP.sessionGet);
+    SESSION = s.authenticated ? (s.admin || null) : null;
 
-      if (SESSION) {
-        setWho("ok", `✅ <strong>${esc(SESSION.login || "admin")}</strong>`);
-      } else {
-        setWho("muted", "Not logged in");
-      }
-    } catch (e) {
-      // If CORS is broken, this will land here.
-      SESSION = null;
-      setWho("err", "Session check failed (CORS?)");
-      console.error(e);
+    if (SESSION) {
+      who.innerHTML = `✅ <strong>${esc(SESSION.login || "admin")}</strong>`;
+      who.className = "pill ok";
+      loginBtn.disabled = true;
+      logoutBtn.disabled = false;
+    } else {
+      who.textContent = "Not logged in";
+      who.className = "pill muted";
+      loginBtn.disabled = false;
+      logoutBtn.disabled = true;
     }
   }
 
   async function login(){
     const r = await jget(EP.startAuth);
-    if (!r.auth_url) throw new Error("Missing auth_url");
-    location.href = r.auth_url;
+    if (!r.auth_url) throw new Error("Missing auth_url from start.php");
+    location.href = r.auth_url; // GitHub OAuth redirect
   }
 
   async function logout(){
     await jget(EP.logout);
     await refreshSession();
-    questTable.style.display = "none";
-    jobTable.style.display = "none";
-    questState.textContent = "Logged out.";
-    jobState.textContent = "Logged out.";
   }
 
   function questRow(q){
     const published = (q.is_published == 1 || q.is_published === true || q.is_published === "1") ? "1" : "0";
     const rel = q.target_release_date || "";
     const hero = q.hero_image || "";
+
     return `
       <tr data-id="${esc(q.id)}" data-code="${esc(q.code)}">
         <td><code>${esc(q.code)}</code></td>
         <td><input data-k="title" value="${esc(q.title||"")}" /></td>
         <td>
           <select data-k="is_published">
-            <option value="0" ${published==="0" ? "selected" : ""}>0</option>
-            <option value="1" ${published==="1" ? "selected" : ""}>1</option>
+            <option value="0" ${published==="0"?"selected":""}>0</option>
+            <option value="1" ${published==="1"?"selected":""}>1</option>
           </select>
         </td>
         <td><input data-k="target_release_date" placeholder="YYYY-MM-DD" value="${esc(rel)}" /></td>
         <td><input data-k="hero_image" placeholder="assets/quests/<code>.jpg" value="${esc(hero)}" /></td>
-        <td class="stickyActions">
+        <td>
           <div class="row">
             <button class="btn" data-action="save" type="button">Save</button>
             <button class="btn" data-action="prompt" type="button">Gen Prompt</button>
@@ -330,11 +333,6 @@
   }
 
   async function loadQuests(){
-    if (!SESSION) {
-      questState.textContent = "Login required.";
-      return;
-    }
-
     questState.textContent = "Loading quests…";
     questTable.style.display = "none";
     questTbody.innerHTML = "";
@@ -353,11 +351,6 @@
   }
 
   async function loadJobs(){
-    if (!SESSION) {
-      jobState.textContent = "Login required.";
-      return;
-    }
-
     jobState.textContent = "Loading jobs…";
     jobTable.style.display = "none";
     jobTbody.innerHTML = "";
@@ -379,12 +372,12 @@
         <td><code>${esc(j.quest_code)}</code></td>
         <td>${esc(j.job_type)}</td>
         <td>${esc(j.status)}</td>
-        <td class="muted">${esc((j.prompt||"").slice(0,120))}${(j.prompt||"").length>120?"…":""}</td>
+        <td class="muted">${esc((j.prompt||"").slice(0,140))}${(j.prompt||"").length>140?"…":""}</td>
       </tr>
     `).join("");
   }
 
-  // Table event delegation (Quests)
+  // Event delegation (quest actions)
   questTbody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
@@ -400,7 +393,6 @@
     tr.querySelectorAll("[data-k]").forEach(el => fields[el.dataset.k] = el.value);
 
     const originalText = btn.textContent;
-
     try {
       btn.disabled = true;
 
@@ -440,7 +432,6 @@
     } catch (err) {
       console.error(err);
       alert(err?.message || "Action failed");
-      btn.textContent = originalText;
     } finally {
       btn.disabled = false;
     }
@@ -449,12 +440,15 @@
   // Buttons
   loginBtn.addEventListener("click", () => login().catch(err => alert(err.message)));
   logoutBtn.addEventListener("click", () => logout().catch(err => alert(err.message)));
-
   reloadBtn.addEventListener("click", async () => {
-    await refreshSession();
-    if (SESSION) {
-      await loadQuests();
-      await loadJobs();
+    try {
+      await refreshSession();
+      if (SESSION) {
+        await loadQuests();
+        await loadJobs();
+      }
+    } catch (err) {
+      alert(err?.message || "Reload failed");
     }
   });
 
@@ -463,10 +457,17 @@
 
   // Boot
   (async () => {
-    await refreshSession();
-    if (SESSION) {
-      await loadQuests();
-      await loadJobs();
+    try {
+      await refreshSession();
+      if (SESSION) {
+        await loadQuests();
+        await loadJobs();
+      }
+    } catch (err) {
+      console.error(err);
+      who.textContent = "Session check failed";
+      who.className = "pill err";
+      alert(err?.message || "Session check failed");
     }
   })();
 </script>
