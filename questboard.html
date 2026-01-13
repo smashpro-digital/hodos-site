@@ -1,1 +1,702 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HODOS — Quest Board</title>
+  <meta name="description" content="Explore available HODOS quests and upcoming releases." />
+
+  <style>
+    :root {
+      --bg: #F6EFE4;
+      --bg2: #FBF7EF;
+      --card: #FFFFFF;
+      --ink: #1A1A1A;
+
+      --gold: #C58A2C;
+      --gold2: #F7D27A;
+      --gold-dark: #6B3F1D;
+      --clay: #E8D6B8;
+
+      --line: rgba(197,138,44,.18);
+      --shadow: 0 20px 46px rgba(0,0,0,.10);
+      --radius: 22px;
+
+      --serif: ui-serif, Georgia, "Times New Roman", Times, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
+        radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 56px 18px 72px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -220px -140px auto auto;
+      width: 620px;
+      height: 620px;
+      background:
+        radial-gradient(circle at top, rgba(247,210,122,.55), rgba(197,138,44,.20) 45%, transparent 70%);
+      filter: blur(2px);
+      opacity: .55;
+      transform: rotate(18deg);
+      pointer-events: none;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      left: -60px;
+      bottom: -70px;
+      width: 560px;
+      height: 240px;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          rgba(107,63,29,.06) 0px,
+          rgba(107,63,29,.06) 10px,
+          transparent 10px,
+          transparent 22px
+        );
+      opacity: .55;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 260px;
+    }
+
+    .app-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.12);
+      border: 1px solid rgba(0,0,0,.06);
+      background: var(--clay);
+      object-fit: cover;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: .2px;
+    }
+
+    .brand .sub {
+      margin: 4px 0 0;
+      color: var(--gold-dark);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .2px;
+    }
+
+    .title {
+      margin: 18px 0 6px;
+      font-family: var(--serif);
+      font-size: 44px;
+      line-height: 1.05;
+      letter-spacing: .2px;
+      color: var(--gold-dark);
+      position: relative;
+      z-index: 1;
+    }
+
+    .lede {
+      margin: 0 0 18px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #3A240F;
+      opacity: .92;
+      max-width: 920px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .divider {
+      margin: 16px 0 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line), transparent);
+      position: relative;
+      z-index: 1;
+    }
+
+    .toolbar {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chip {
+      appearance: none;
+      border: 1px solid rgba(197,138,44,.30);
+      background: rgba(232,214,184,.65);
+      color: #3A240F;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+      user-select: none;
+      line-height: 1;
+      font-size: 13px;
+    }
+
+    .chip:hover { transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.10); }
+    .chip[aria-pressed="true"] { background: radial-gradient(circle at top, #F7D27A, var(--gold)); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(197,138,44,.30);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+      user-select: none;
+      background: rgba(255,255,255,.7);
+      color: inherit;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.12); }
+    .btn-primary {
+      background: radial-gradient(circle at top, #F7D27A, var(--gold));
+      color: #3A240F;
+      box-shadow: 0 10px 20px rgba(197,138,44,.20);
+    }
+
+    .grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) {
+      .card { padding: 22px; }
+      .title { font-size: 36px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .quest-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(197,138,44,.20);
+      box-shadow: 0 14px 30px rgba(0,0,0,.10);
+      backdrop-filter: blur(4px);
+      min-height: 244px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      position: relative;
+      height: 148px;
+      background:
+        radial-gradient(900px 260px at 20% 10%, rgba(247,210,122,.55), transparent 55%),
+        radial-gradient(800px 260px at 80% 0%, rgba(197,138,44,.30), transparent 62%),
+        linear-gradient(135deg, rgba(232,214,184,.78), rgba(255,255,255,.66));
+    }
+
+    .pill {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .8px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 10px 18px rgba(0,0,0,.10);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .pill.easy { background: rgba(46,125,50,.88); color: #fff; }
+    .pill.medium { background: rgba(197,138,44,.92); color: #2B1A0B; }
+    .pill.hard { background: rgba(66,66,66,.88); color: #fff; }
+    .pill.coming { background: rgba(88,88,88,.85); color: #fff; }
+
+    .lock {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(197,138,44,.22);
+      border: 1px solid rgba(197,138,44,.30);
+      box-shadow: 0 10px 18px rgba(0,0,0,.10);
+    }
+
+    .lock svg { width: 18px; height: 18px; fill: #6B3F1D; opacity: .95; }
+
+    .body {
+      padding: 14px 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .name {
+      margin: 0;
+      font-size: 24px;
+      font-family: var(--serif);
+      letter-spacing: .2px;
+      color: #3A240F;
+      line-height: 1.1;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(58,36,15,.78);
+      font-weight: 800;
+      font-size: 14px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      opacity: .95;
+      white-space: nowrap;
+    }
+
+    .meta-item svg { width: 16px; height: 16px; fill: rgba(58,36,15,.72); }
+
+    .submeta {
+      margin-top: 2px;
+      font-size: 13px;
+      color: rgba(58,36,15,.74);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .submeta .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(58,36,15,.35);
+    }
+
+    .release {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(197,138,44,.22);
+      background: rgba(232,214,184,.55);
+      color: #3A240F;
+      font-weight: 800;
+      font-size: 12px;
+      width: fit-content;
+    }
+
+    .release svg { width: 14px; height: 14px; fill: rgba(58,36,15,.72); }
+
+    .empty, .error, .loading {
+      margin-top: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(197,138,44,.18);
+      background: rgba(255,255,255,.72);
+      padding: 14px 14px;
+      color: #3A240F;
+      position: relative;
+      z-index: 1;
+    }
+
+    .error { border-color: rgba(190,0,0,.18); background: rgba(255,150,150,.12); }
+    .muted { opacity: .8; }
+
+    footer {
+      margin-top: 22px;
+      font-size: 14px;
+      color: #5A4636;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .micro { opacity: .85; }
+
+    code.k {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      background: rgba(232,214,184,.55);
+      border: 1px solid rgba(197,138,44,.18);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="brand">
+          <img src="./assets/hodos-icon.png" alt="HODOS app icon" class="app-icon" />
+          <div>
+            <h1>HODOS</h1>
+            <div class="sub">One Day. One Step.</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <a class="btn" href="./index.html" aria-label="Back to home">← Home</a>
+          <button class="btn btn-primary" id="refreshBtn" type="button" aria-label="Refresh quest board">
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      <h2 class="title">Quest Board</h2>
+      <p class="lede">
+        Explore quests available now and preview future releases. Premium rewards and artifacts are locked in public preview.
+        <span class="muted">API:</span> <code class="k" id="apiHint"></code>
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="toolbar" aria-label="Quest board filters">
+        <div class="controls">
+          <button class="chip" data-status="available" aria-pressed="true" type="button">Available</button>
+          <button class="chip" data-status="coming_soon" aria-pressed="false" type="button">Coming Soon</button>
+          <button class="chip" data-status="all" aria-pressed="false" type="button">All</button>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="copyLinkBtn" type="button" aria-label="Copy share link">Copy link</button>
+          <a class="btn" href="./privacy.html">Privacy</a>
+          <a class="btn" href="./terms.html">Terms</a>
+          <a class="btn" href="./support.html">Support</a>
+        </div>
+      </div>
+
+      <div id="state" class="loading">Loading quests…</div>
+      <div id="grid" class="grid" aria-live="polite"></div>
+
+      <footer>
+        <div>© <span id="y"></span> HODOS</div>
+        <div class="micro">Built by <a href="https://dashboard.smashpro.app" target="_blank" rel="noopener noreferrer">SmashPro Digital</a></div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Year
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    // --- Config ---
+    const APP_SLUG = "hodos";
+    const ENDPOINT = "https://smashpro.app/api/public/quest/index.php";
+
+    // UI
+    const gridEl = document.getElementById("grid");
+    const stateEl = document.getElementById("state");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const chips = Array.from(document.querySelectorAll(".chip"));
+    const apiHint = document.getElementById("apiHint");
+    const copyLinkBtn = document.getElementById("copyLinkBtn");
+
+    apiHint.textContent = `${ENDPOINT}?app_slug=${encodeURIComponent(APP_SLUG)}&status=available`;
+
+    function fmtKm(meters) {
+      const m = Number(meters || 0);
+      if (!isFinite(m) || m <= 0) return null;
+      const km = m / 1000;
+      return (Math.round(km * 10) / 10).toFixed(1) + " km";
+    }
+
+    function fmtMin(sec) {
+      const s = Number(sec || 0);
+      if (!isFinite(s) || s <= 0) return null;
+      const min = Math.round(s / 60);
+      return `${min} min`;
+    }
+
+    function fmtDateShort(isoOrSql) {
+      if (!isoOrSql) return null;
+      const d = new Date(isoOrSql);
+      if (isNaN(d.getTime())) return String(isoOrSql);
+      return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    function iconLock() {
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 016 0v3H9z"/>
+        </svg>
+      `;
+    }
+
+    function iconPin() {
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a7 7 0 00-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z"/>
+        </svg>
+      `;
+    }
+
+    function iconClock() {
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 1a11 11 0 1011 11A11 11 0 0012 1zm1 11.4l4.1 2.4-.9 1.5L11 13V6h2z"/>
+        </svg>
+      `;
+    }
+
+    function iconCalendar() {
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 2h2v2h6V2h2v2h3a2 2 0 012 2v14a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h3V2zm14 8H3v10h18V10z"/>
+        </svg>
+      `;
+    }
+
+    function difficultyClass(diff) {
+      const d = String(diff || "").toLowerCase();
+      if (d.includes("hard")) return "hard";
+      if (d.includes("med")) return "medium";
+      return "easy";
+    }
+
+    function safeText(s) {
+      return String(s ?? "").replace(/[&<>"]/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"
+      }[c]));
+    }
+
+    function makeQuestCard(q) {
+      const title = safeText(q.title || q.quest_title || q.quest_code || "Quest");
+      const diff = safeText(q.difficulty || "easy");
+      const diffCls = difficultyClass(diff);
+      const availability = String(q.availability || "available");
+      const isComing = availability === "coming_soon" || (q.target_release_date != null && q.target_release_date !== "");
+
+      const pillText = isComing ? "COMING SOON" : diff.toUpperCase();
+      const pillCls = isComing ? "coming" : diffCls;
+
+      const km = fmtKm(q.distance_meters);
+      const min = fmtMin(q.est_duration_sec);
+
+      const release = q.target_release_date ? fmtDateShort(q.target_release_date) : null;
+
+      // Data health (optional small hint)
+      const missing =
+        (Number(q.missing_story) === 1) ||
+        (Number(q.missing_route) === 1) ||
+        (Number(q.missing_checkpoints) === 1);
+
+      const healthBits = [];
+      if (Number(q.missing_voice_lines) === 1) healthBits.push("voice");
+      if (Number(q.missing_artifact_rewards) === 1) healthBits.push("rewards");
+      if (missing) healthBits.unshift("incomplete");
+
+      const health = healthBits.length ? healthBits.join(" • ") : "ready";
+
+      return `
+        <div class="quest-card" role="article" aria-label="${title}">
+          <div class="hero">
+            <div class="pill ${pillCls}">${pillText}</div>
+            <div class="lock" title="Premium details locked" aria-label="Premium details locked">${iconLock()}</div>
+          </div>
+          <div class="body">
+            <h3 class="name">${title}</h3>
+
+            <div class="meta">
+              ${km ? `<span class="meta-item" title="Distance">${iconPin()} ${km}</span>` : ""}
+              ${min ? `<span class="meta-item" title="Duration">${iconClock()} ${min}</span>` : ""}
+            </div>
+
+            <div class="submeta">
+              <span><strong>Code:</strong> ${safeText(q.code || q.quest_code || "")}</span>
+              <span class="dot" aria-hidden="true"></span>
+              <span><strong>Status:</strong> ${isComing ? "coming soon" : "available"}</span>
+              <span class="dot" aria-hidden="true"></span>
+              <span><strong>Health:</strong> ${safeText(health)}</span>
+            </div>
+
+            ${release ? `
+              <div class="release" title="Target release date">
+                ${iconCalendar()} Releases ${safeText(release)}
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function setState(kind, message) {
+      stateEl.className = kind;
+      stateEl.textContent = message;
+      stateEl.style.display = "block";
+    }
+
+    function clearState() {
+      stateEl.style.display = "none";
+      stateEl.textContent = "";
+    }
+
+    function setChips(status) {
+      chips.forEach((c) => {
+        const on = c.dataset.status === status;
+        c.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    }
+
+    function getStatusFromUrl() {
+      const u = new URL(location.href);
+      const s = (u.searchParams.get("status") || "available").trim();
+      return (s === "coming_soon" || s === "all") ? s : "available";
+    }
+
+    function setStatusInUrl(status) {
+      const u = new URL(location.href);
+      u.searchParams.set("status", status);
+      history.replaceState({}, "", u.toString());
+    }
+
+    async function load(status) {
+      setChips(status);
+      setStatusInUrl(status);
+
+      gridEl.innerHTML = "";
+      setState("loading", "Loading quests…");
+
+      const url = new URL(ENDPOINT);
+      url.searchParams.set("app_slug", APP_SLUG);
+      url.searchParams.set("status", status);
+      url.searchParams.set("activeOnly", "1");
+      url.searchParams.set("publishedOnly", "1");
+
+      apiHint.textContent = url.toString();
+
+      try {
+        const res = await fetch(url.toString(), { method: "GET", mode: "cors" });
+        const ct = (res.headers.get("content-type") || "").toLowerCase();
+        const data = ct.includes("application/json") ? await res.json() : { _text: await res.text() };
+
+        if (!res.ok || data.ok === false) {
+          const msg = data.error || data.message || `Request failed (${res.status})`;
+          throw new Error(msg);
+        }
+
+        const quests = Array.isArray(data.quests) ? data.quests : [];
+        if (!quests.length) {
+          setState("empty", "No quests found for this filter.");
+          return;
+        }
+
+        clearState();
+        gridEl.innerHTML = quests.map(makeQuestCard).join("");
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : "Failed to load quests.";
+        setState("error", `Could not load quest board.\n${msg}`);
+      }
+    }
+
+    // Wire filter chips
+    chips.forEach((c) => {
+      c.addEventListener("click", () => load(c.dataset.status || "available"));
+    });
+
+    refreshBtn.addEventListener("click", () => load(getStatusFromUrl()));
+
+    copyLinkBtn.addEventListener("click", async () => {
+      const u = new URL(location.href);
+      if (!u.searchParams.get("status")) u.searchParams.set("status", getStatusFromUrl());
+      try {
+        await navigator.clipboard.writeText(u.toString());
+        copyLinkBtn.textContent = "Copied ✅";
+        setTimeout(() => (copyLinkBtn.textContent = "Copy link"), 900);
+      } catch {
+        // fallback: prompt
+        window.prompt("Copy link:", u.toString());
+      }
+    });
+
+    // Initial load
+    load(getStatusFromUrl());
+  </script>
+</body>
+</html>
