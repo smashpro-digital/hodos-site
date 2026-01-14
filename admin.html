@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HODOS Admin — Quests & Assets</title>
-  <meta name="description" content="HODOS Admin: quests, releases, and asset jobs queue (GitHub-authenticated)." />
+  <meta name="robots" content="noindex,nofollow" />
 
   <style>
     :root{
@@ -25,25 +25,16 @@
     .wrap{max-width:1200px;margin:0 auto;padding:34px 16px 60px}
     .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     h1{margin:0;font-family:var(--serif);color:var(--gold-dark);letter-spacing:.2px}
+    .sub{font-size:12px;color:rgba(58,36,15,.78);margin-top:4px}
     .card{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{
-      border:1px solid rgba(197,138,44,.32);
-      background:rgba(255,255,255,.75);
-      border-radius:999px;
-      padding:10px 12px;
-      font-weight:800;
-      cursor:pointer;
-      transition: transform .12s ease, box-shadow .12s ease;
-      user-select:none;
-    }
-    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.10); }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+    .btn{border:1px solid rgba(197,138,44,.32);background:rgba(255,255,255,.75);border-radius:999px;padding:10px 12px;font-weight:800;cursor:pointer}
     .btn.primary{background:radial-gradient(circle at top,var(--gold2),var(--gold));color:#3A240F}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;
-      border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800
-    }
+    .btn.danger{border-color:rgba(190,0,0,.25);background:rgba(255,150,150,.12)}
+    .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800}
+    .pill.warn{background:rgba(255,214,102,.35);border-color:rgba(197,138,44,.25)}
+    .pill.ok{background:rgba(46,125,50,.14);border-color:rgba(46,125,50,.25);color:#1b5e20}
+    .pill.err{background:rgba(255,150,150,.20);border-color:rgba(190,0,0,.22);color:#8b0000}
     .grid{display:grid;grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px}
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     table{width:100%;border-collapse:collapse}
@@ -57,39 +48,40 @@
     @media(max-width:720px){.two{grid-template-columns:1fr}}
     .hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
     .mini{font-size:12px;color:rgba(58,36,15,.78)}
-    .ok{color:#1b5e20;font-weight:900}
-    .err{color:#8b0000;font-weight:900}
-    .tip{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(197,138,44,.18);
-      background: rgba(255,255,255,.70);
-      font-size:13px;
-      color: rgba(58,36,15,.88);
-      line-height:1.45;
+    .tip{font-size:12px;color:rgba(58,36,15,.70);margin-top:10px;line-height:1.5}
+    .notice{
+      margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(197,138,44,.20);
+      background:rgba(232,214,184,.45);color:#3A240F;display:none;white-space:pre-wrap
     }
-    .kbd{font-family:var(--mono);font-size:12px;background:rgba(232,214,184,.55);border:1px solid rgba(197,138,44,.18);padding:2px 6px;border-radius:8px}
-    .rightcol-note{margin-top:10px}
+    .notice.show{display:block}
+    .notice.ok{background:rgba(46,125,50,.12);border-color:rgba(46,125,50,.20)}
+    .notice.err{background:rgba(255,150,150,.18);border-color:rgba(190,0,0,.18)}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;font-size:12px;
+      padding:6px 10px;border-radius:999px;border:1px solid rgba(0,0,0,.06);
+      background:rgba(255,255,255,.65)
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
       <div>
         <h1>HODOS Admin</h1>
-        <div class="mini">Quests, releases, and asset jobs queue (GitHub-authenticated)</div>
+        <div class="sub">Quests, releases, and asset jobs queue (AUTH BYPASS MODE)</div>
       </div>
       <div class="row">
-        <span class="pill" id="who">Checking session…</span>
-        <button class="btn" id="loginBtn" type="button">Login with GitHub</button>
-        <button class="btn" id="logoutBtn" type="button">Logout</button>
-        <button class="btn primary" id="reloadBtn" type="button">Reload</button>
+        <span class="pill warn" id="modePill">🔓 Auth bypass enabled</span>
+        <button class="btn primary" id="reloadBtn">Reload</button>
+        <button class="btn danger" id="hardResetBtn" title="Clears UI state only (not server)">Clear UI</button>
       </div>
     </div>
 
+    <div class="notice" id="notice"></div>
+
     <div class="grid">
-      <!-- LEFT: QUESTS -->
+      <!-- LEFT: Quests -->
       <div class="card">
         <div class="row" style="justify-content:space-between;">
           <div class="pill">Quests</div>
@@ -97,7 +89,7 @@
             <select id="appSlug" style="max-width:220px;">
               <option value="hodos">hodos</option>
             </select>
-            <button class="btn" id="loadQuestsBtn" type="button">Load quests</button>
+            <button class="btn" id="loadQuestsBtn">Load quests</button>
           </div>
         </div>
 
@@ -106,11 +98,12 @@
         <div id="questState" class="muted">No data loaded yet.</div>
 
         <div class="tip">
-          Tip: <span class="kbd">Hero Image</span> should be a site path like
-          <span class="kbd">assets/quests/returning_light.jpg</span>. Your public quest tiles can read this and render a real scene per <span class="kbd">quest_code</span>.
+          Tip: “Hero Image” should be a site path like
+          <span class="badge"><code>assets/quests/returning_light.jpg</code></span>.
+          Your quest tiles (public pages) can read this and render real scenes per <code>quest_code</code>.
         </div>
 
-        <div style="overflow:auto; margin-top:10px;">
+        <div style="overflow:auto;margin-top:10px;">
           <table id="questTable" style="display:none;">
             <thead>
               <tr>
@@ -127,7 +120,7 @@
         </div>
       </div>
 
-      <!-- RIGHT: JOBS -->
+      <!-- RIGHT: Jobs -->
       <div class="card">
         <div class="row" style="justify-content:space-between;">
           <div class="pill">Asset Jobs</div>
@@ -140,7 +133,7 @@
               <option value="failed">failed</option>
               <option value="all">all</option>
             </select>
-            <button class="btn" id="loadJobsBtn" type="button">Load jobs</button>
+            <button class="btn" id="loadJobsBtn">Load jobs</button>
           </div>
         </div>
 
@@ -148,13 +141,7 @@
 
         <div id="jobState" class="muted">No jobs loaded yet.</div>
 
-        <div class="tip rightcol-note">
-          Note: If DevTools shows <span class="kbd">CORS error</span> but your server logs show HTTP 200,
-          your API likely isn’t returning <span class="kbd">Access-Control-Allow-Origin</span> and
-          <span class="kbd">Access-Control-Allow-Credentials</span> for credentialed requests.
-        </div>
-
-        <div style="overflow:auto; max-height:520px; margin-top:10px;">
+        <div style="overflow:auto; max-height:520px;margin-top:10px;">
           <table id="jobTable" style="display:none;">
             <thead>
               <tr>
@@ -168,33 +155,52 @@
             <tbody id="jobTbody"></tbody>
           </table>
         </div>
+
+        <div class="tip">
+          If your API returns JSON like <code>{ ok:false, error:"Server config error", correlation_id:"..." }</code>,
+          paste the <code>correlation_id</code> into your server logs lookup so you can find the exact fatal path/line.
+        </div>
       </div>
     </div>
   </div>
 
 <script>
-  // ---------- CONFIG ----------
-  const API_BASE = "https://smashpro.app/api/v1/admin";
+  // =========================
+  // CONFIG (AUTH BYPASS MODE)
+  // =========================
+  // Admin endpoints (write actions)
+  const ADMIN_BASE = "https://smashpro.app/api/v1/admin";
 
+  // Public quests endpoint (read-only fallback)
+  const PUBLIC_QUESTS = "https://smashpro.app/api/public/quest/index.php";
+
+  // Toggle which list endpoint to use first:
+  // - true: try ADMIN list first, fall back to PUBLIC if it errors
+  // - false: use PUBLIC list only
+  const TRY_ADMIN_LIST_FIRST = true;
+
+  // Endpoints
   const EP = {
-    startAuth: `${API_BASE}/github/start.php`,
-    sessionGet: `${API_BASE}/session/get.php`,
-    logout: `${API_BASE}/session/logout.php`,
+    // read
+    questsListAdmin: `${ADMIN_BASE}/quests/list.php`,
+    questsListPublic: `${PUBLIC_QUESTS}`,
 
-    questsList: `${API_BASE}/quests/list.php`,
-    questsUpdate: `${API_BASE}/quests/update.php`,
+    jobsList: `${ADMIN_BASE}/jobs/list.php`,
 
-    jobsList: `${API_BASE}/jobs/list.php`,
-    jobsCreate: `${API_BASE}/jobs/create.php`,
+    // write
+    questsUpdate: `${ADMIN_BASE}/quests/update.php`,
+    jobsCreate: `${ADMIN_BASE}/jobs/create.php`,
 
-    promptsQuestTile: `${API_BASE}/prompts/quest_tile.php`,
+    // prompt endpoint (optional; UI has local fallback)
+    promptsQuestTile: `${ADMIN_BASE}/prompts/quest_tile.php`,
   };
 
-  // ---------- UI ----------
-  const who = document.getElementById("who");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+  // =========================
+  // UI refs
+  // =========================
+  const notice = document.getElementById("notice");
   const reloadBtn = document.getElementById("reloadBtn");
+  const hardResetBtn = document.getElementById("hardResetBtn");
 
   const appSlug = document.getElementById("appSlug");
   const loadQuestsBtn = document.getElementById("loadQuestsBtn");
@@ -208,107 +214,85 @@
   const jobTable = document.getElementById("jobTable");
   const jobTbody = document.getElementById("jobTbody");
 
-  let SESSION = null;
-
+  // =========================
+  // Helpers
+  // =========================
   function esc(s){
-    return String(s ?? "").replace(/[&<>"]/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"
-    }[c]));
+    return String(s ?? "").replace(/[&<>"]/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
   }
 
-  // Better error text for CORS / network failures
-  function explainFetchError(err){
-    const msg = String(err?.message || err || "");
-    // Most browsers throw TypeError: Failed to fetch for CORS/network
-    if (/Failed to fetch/i.test(msg) || /NetworkError/i.test(msg)) {
-      return [
-        "Request failed (network/CORS).",
-        "If this is GitHub Pages → smashpro.app, make sure your API returns:",
-        "  - Access-Control-Allow-Origin: https://smashpro-digital.github.io",
-        "  - Access-Control-Allow-Credentials: true",
-        "and does NOT use '*' when credentials are included."
-      ].join("\n");
-    }
-    return msg || "Request failed.";
+  function setNotice(type, msg){
+    notice.className = "notice show " + (type === "ok" ? "ok" : "err");
+    notice.textContent = msg || "";
+  }
+  function clearNotice(){
+    notice.className = "notice";
+    notice.textContent = "";
   }
 
-  async function safeParse(res){
+  async function safeRead(res){
     const ct = (res.headers.get("content-type") || "").toLowerCase();
-    if (ct.includes("application/json")) return await res.json().catch(() => ({}));
-    const text = await res.text().catch(() => "");
-    return { _text: text };
+    if (ct.includes("application/json")) {
+      return await res.json().catch(() => ({}));
+    }
+    const t = await res.text().catch(() => "");
+    return { _text: t };
   }
 
+  // AUTH BYPASS: no cookies required
   async function jget(url){
-    let r;
-    try {
-      r = await fetch(url, { credentials: "include" });
-    } catch (err) {
-      throw new Error(explainFetchError(err));
-    }
-    const data = await safeParse(r);
-
+    const r = await fetch(url, {
+      method: "GET",
+      headers: { "Accept":"application/json" },
+      cache: "no-store",
+    });
+    const data = await safeRead(r);
     if (!r.ok || data.ok === false) {
-      const msg = data.error || data.message || (data._text ? String(data._text).slice(0,180) : "") || `HTTP ${r.status}`;
-      throw new Error(msg);
+      const cid = data.correlation_id ? `\ncorrelation_id: ${data.correlation_id}` : "";
+      throw new Error((data.error || data.message || `HTTP ${r.status}`) + cid);
     }
     return data;
   }
 
   async function jpost(url, body){
-    let r;
-    try {
-      r = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(body || {})
-      });
-    } catch (err) {
-      throw new Error(explainFetchError(err));
-    }
-    const data = await safeParse(r);
-
+    const r = await fetch(url, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(body || {}),
+    });
+    const data = await safeRead(r);
     if (!r.ok || data.ok === false) {
-      const msg = data.error || data.message || (data._text ? String(data._text).slice(0,180) : "") || `HTTP ${r.status}`;
-      throw new Error(msg);
+      const cid = data.correlation_id ? `\ncorrelation_id: ${data.correlation_id}` : "";
+      throw new Error((data.error || data.message || `HTTP ${r.status}`) + cid);
     }
     return data;
   }
 
-  async function refreshSession(){
-    const s = await jget(EP.sessionGet);
-    SESSION = s.authenticated ? (s.admin || null) : null;
+  // Local prompt fallback (keeps you moving even if prompt endpoint is down)
+  function localQuestTilePrompt({ quest_code, title }){
+    const safeTitle = title || quest_code || "HODOS Quest";
+    const code = quest_code || "quest_code_here";
 
-    if (SESSION) {
-      who.innerHTML = `✅ <strong>${esc(SESSION.login || "admin")}</strong>`;
-      who.className = "pill ok";
-      loginBtn.disabled = true;
-      logoutBtn.disabled = false;
-    } else {
-      who.textContent = "Not logged in";
-      who.className = "pill muted";
-      loginBtn.disabled = false;
-      logoutBtn.disabled = true;
-    }
-  }
+    const prompt =
+`HODOS app quest tile art (single image).
+Title: "${safeTitle}"
+Quest code: "${code}"
 
-  async function login(){
-    const r = await jget(EP.startAuth);
-    if (!r.auth_url) throw new Error("Missing auth_url from start.php");
-    location.href = r.auth_url; // GitHub OAuth redirect
-  }
+Style: cinematic fantasy illustration, warm gold + clay palette, ancient mythic atmosphere, soft volumetric light, high detail, painterly realism, subtle UI-safe composition (leave space at top-left for difficulty pill and bottom-right for lock icon).
+Subject: a symbolic scene that visually represents "${safeTitle}" without text.
 
-  async function logout(){
-    await jget(EP.logout);
-    await refreshSession();
+Output: 1024x1024 PNG, no text, no watermark, no logo.`;
+
+    const negative =
+`text, watermark, logo, frame text, blurry, low-res, jpeg artifacts, deformed anatomy, extra limbs, gore, explicit nudity, hateful symbols`;
+
+    return { prompt, negative_prompt: negative };
   }
 
   function questRow(q){
-    const published = (q.is_published == 1 || q.is_published === true || q.is_published === "1") ? "1" : "0";
+    const published = (q.is_published == 1 || q.is_published === true) ? "1" : "0";
     const rel = q.target_release_date || "";
     const hero = q.hero_image || "";
-
     return `
       <tr data-id="${esc(q.id)}" data-code="${esc(q.code)}">
         <td><code>${esc(q.code)}</code></td>
@@ -320,12 +304,12 @@
           </select>
         </td>
         <td><input data-k="target_release_date" placeholder="YYYY-MM-DD" value="${esc(rel)}" /></td>
-        <td><input data-k="hero_image" placeholder="assets/quests/<code>.jpg" value="${esc(hero)}" /></td>
+        <td><input data-k="hero_image" placeholder="assets/quests/${esc(q.code||"quest_code")}.jpg" value="${esc(hero)}" /></td>
         <td>
           <div class="row">
-            <button class="btn" data-action="save" type="button">Save</button>
-            <button class="btn" data-action="prompt" type="button">Gen Prompt</button>
-            <button class="btn primary" data-action="queue" type="button">Queue Tile Job</button>
+            <button class="btn" data-action="save">Save</button>
+            <button class="btn" data-action="prompt">Gen Prompt</button>
+            <button class="btn primary" data-action="queue">Queue Tile Job</button>
           </div>
         </td>
       </tr>
@@ -333,11 +317,31 @@
   }
 
   async function loadQuests(){
+    clearNotice();
     questState.textContent = "Loading quests…";
     questTable.style.display = "none";
     questTbody.innerHTML = "";
 
-    const data = await jget(`${EP.questsList}?app_slug=${encodeURIComponent(appSlug.value)}`);
+    const slug = encodeURIComponent(appSlug.value);
+
+    let data = null;
+    let used = "";
+
+    if (TRY_ADMIN_LIST_FIRST) {
+      try {
+        data = await jget(`${EP.questsListAdmin}?app_slug=${slug}`);
+        used = "admin";
+      } catch (e) {
+        // fall back to public
+        data = await jget(`${EP.questsListPublic}?app_slug=${slug}`);
+        used = "public";
+        setNotice("ok", `Loaded quests via PUBLIC endpoint (admin list failed).\n${e.message}`);
+      }
+    } else {
+      data = await jget(`${EP.questsListPublic}?app_slug=${slug}`);
+      used = "public";
+    }
+
     const quests = Array.isArray(data.quests) ? data.quests : [];
 
     if (!quests.length){
@@ -345,17 +349,20 @@
       return;
     }
 
-    questState.textContent = "";
+    questState.innerHTML = `Loaded <strong>${quests.length}</strong> quests (${used}).`;
     questTable.style.display = "";
     questTbody.innerHTML = quests.map(questRow).join("");
   }
 
   async function loadJobs(){
+    clearNotice();
     jobState.textContent = "Loading jobs…";
     jobTable.style.display = "none";
     jobTbody.innerHTML = "";
 
-    const url = `${EP.jobsList}?app_slug=${encodeURIComponent(appSlug.value)}&status=${encodeURIComponent(jobStatus.value)}`;
+    const url =
+      `${EP.jobsList}?app_slug=${encodeURIComponent(appSlug.value)}&status=${encodeURIComponent(jobStatus.value)}`;
+
     const data = await jget(url);
     const jobs = Array.isArray(data.jobs) ? data.jobs : [];
 
@@ -363,8 +370,7 @@
       jobState.textContent = "No jobs found for this filter.";
       return;
     }
-
-    jobState.textContent = "";
+    jobState.innerHTML = `Loaded <strong>${jobs.length}</strong> jobs.`;
     jobTable.style.display = "";
     jobTbody.innerHTML = jobs.map(j => `
       <tr>
@@ -372,12 +378,12 @@
         <td><code>${esc(j.quest_code)}</code></td>
         <td>${esc(j.job_type)}</td>
         <td>${esc(j.status)}</td>
-        <td class="muted">${esc((j.prompt||"").slice(0,140))}${(j.prompt||"").length>140?"…":""}</td>
+        <td class="muted">${esc((j.prompt||"").slice(0,120))}${(j.prompt||"").length>120?"…":""}</td>
       </tr>
     `).join("");
   }
 
-  // Event delegation (quest actions)
+  // Delegated actions for quest table
   questTbody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
@@ -392,45 +398,53 @@
     const fields = {};
     tr.querySelectorAll("[data-k]").forEach(el => fields[el.dataset.k] = el.value);
 
-    const originalText = btn.textContent;
     try {
       btn.disabled = true;
 
       if (action === "save") {
         await jpost(EP.questsUpdate, { id, ...fields });
         btn.textContent = "Saved ✅";
-        setTimeout(() => (btn.textContent = originalText), 900);
+        setTimeout(()=>btn.textContent="Save", 900);
       }
 
       if (action === "prompt") {
-        const promptRes = await jpost(EP.promptsQuestTile, {
-          quest_code: code,
-          title: fields.title || ""
-        });
-        window.prompt("Quest Tile Prompt (copy):", promptRes.prompt || "");
+        // Try server prompt endpoint first; fallback local prompt
+        let pr = null;
+        try {
+          pr = await jpost(EP.promptsQuestTile, { quest_code: code, title: fields.title || "" });
+        } catch (err) {
+          pr = localQuestTilePrompt({ quest_code: code, title: fields.title || "" });
+          setNotice("ok", `Prompt endpoint failed, using LOCAL prompt generator.\n${err.message}`);
+        }
+        window.prompt("Quest Tile Prompt (copy):", pr.prompt || "");
       }
 
       if (action === "queue") {
-        const promptRes = await jpost(EP.promptsQuestTile, {
-          quest_code: code,
-          title: fields.title || ""
-        });
+        // Build prompt (server -> fallback local)
+        let pr = null;
+        try {
+          pr = await jpost(EP.promptsQuestTile, { quest_code: code, title: fields.title || "" });
+        } catch (err) {
+          pr = localQuestTilePrompt({ quest_code: code, title: fields.title || "" });
+          setNotice("ok", `Prompt endpoint failed, using LOCAL prompt generator.\n${err.message}`);
+        }
 
         await jpost(EP.jobsCreate, {
           app_slug: appSlug.value,
           quest_code: code,
           job_type: "quest_tile",
           priority: 50,
-          prompt: promptRes.prompt,
-          negative_prompt: promptRes.negative_prompt
+          prompt: pr.prompt,
+          negative_prompt: pr.negative_prompt
         });
 
         btn.textContent = "Queued ✅";
-        setTimeout(() => (btn.textContent = originalText), 900);
+        setTimeout(()=>btn.textContent="Queue Tile Job", 900);
         await loadJobs();
       }
     } catch (err) {
       console.error(err);
+      setNotice("err", err?.message || "Action failed");
       alert(err?.message || "Action failed");
     } finally {
       btn.disabled = false;
@@ -438,37 +452,29 @@
   });
 
   // Buttons
-  loginBtn.addEventListener("click", () => login().catch(err => alert(err.message)));
-  logoutBtn.addEventListener("click", () => logout().catch(err => alert(err.message)));
+  loadQuestsBtn.addEventListener("click", () => loadQuests().catch(err => setNotice("err", err.message)));
+  loadJobsBtn.addEventListener("click", () => loadJobs().catch(err => setNotice("err", err.message)));
+
   reloadBtn.addEventListener("click", async () => {
-    try {
-      await refreshSession();
-      if (SESSION) {
-        await loadQuests();
-        await loadJobs();
-      }
-    } catch (err) {
-      alert(err?.message || "Reload failed");
-    }
+    clearNotice();
+    await loadQuests().catch(err => setNotice("err", err.message));
+    await loadJobs().catch(err => setNotice("err", err.message));
   });
 
-  loadQuestsBtn.addEventListener("click", () => loadQuests().catch(err => alert(err.message)));
-  loadJobsBtn.addEventListener("click", () => loadJobs().catch(err => alert(err.message)));
+  hardResetBtn.addEventListener("click", () => {
+    clearNotice();
+    questState.textContent = "No data loaded yet.";
+    jobState.textContent = "No jobs loaded yet.";
+    questTable.style.display = "none";
+    jobTable.style.display = "none";
+    questTbody.innerHTML = "";
+    jobTbody.innerHTML = "";
+  });
 
   // Boot
   (async () => {
-    try {
-      await refreshSession();
-      if (SESSION) {
-        await loadQuests();
-        await loadJobs();
-      }
-    } catch (err) {
-      console.error(err);
-      who.textContent = "Session check failed";
-      who.className = "pill err";
-      alert(err?.message || "Session check failed");
-    }
+    await loadQuests().catch(err => setNotice("err", err.message));
+    await loadJobs().catch(err => setNotice("err", err.message));
   })();
 </script>
 </body>
