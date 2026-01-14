@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HODOS Admin — Quests & Assets</title>
-  <meta name="robots" content="noindex,nofollow" />
+  <meta name="description" content="HODOS Admin tool for quests and asset job queue." />
 
   <style>
     :root{
@@ -13,16 +13,16 @@
       --shadow: 0 16px 40px rgba(0,0,0,.12); --r: 18px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       --serif: ui-serif, Georgia, "Times New Roman", Times, serif;
+      --ok:#1b5e20; --err:#8b0000;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
-      background:
-        radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
-        radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
-        linear-gradient(180deg,var(--bg2),var(--bg));
+      background: radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
+                  radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
+                  linear-gradient(180deg,var(--bg2),var(--bg));
       min-height:100vh;
     }
-    .wrap{max-width:1200px;margin:0 auto;padding:34px 16px 60px}
+    .wrap{max-width:1250px;margin:0 auto;padding:34px 16px 60px}
     .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     h1{margin:0;font-family:var(--serif);color:var(--gold-dark);letter-spacing:.2px}
     .sub{font-size:12px;color:rgba(58,36,15,.78);margin-top:4px}
@@ -30,11 +30,8 @@
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{border:1px solid rgba(197,138,44,.32);background:rgba(255,255,255,.75);border-radius:999px;padding:10px 12px;font-weight:800;cursor:pointer}
     .btn.primary{background:radial-gradient(circle at top,var(--gold2),var(--gold));color:#3A240F}
-    .btn.danger{border-color:rgba(190,0,0,.25);background:rgba(255,150,150,.12)}
+    .btn.danger{border-color: rgba(190,0,0,.25); background: rgba(255,150,150,.15); color:#3A240F;}
     .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800}
-    .pill.warn{background:rgba(255,214,102,.35);border-color:rgba(197,138,44,.25)}
-    .pill.ok{background:rgba(46,125,50,.14);border-color:rgba(46,125,50,.25);color:#1b5e20}
-    .pill.err{background:rgba(255,150,150,.20);border-color:rgba(190,0,0,.22);color:#8b0000}
     .grid{display:grid;grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px}
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     table{width:100%;border-collapse:collapse}
@@ -48,18 +45,28 @@
     @media(max-width:720px){.two{grid-template-columns:1fr}}
     .hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
     .mini{font-size:12px;color:rgba(58,36,15,.78)}
-    .tip{font-size:12px;color:rgba(58,36,15,.70);margin-top:10px;line-height:1.5}
-    .notice{
-      margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(197,138,44,.20);
-      background:rgba(232,214,184,.45);color:#3A240F;display:none;white-space:pre-wrap
+    .ok{color:var(--ok);font-weight:900}
+    .err{color:var(--err);font-weight:900}
+    .banner{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(197,138,44,.20);
+      background: rgba(232,214,184,.45);
+      color:#3A240F;
+      display:none;
+      white-space:pre-wrap;
     }
-    .notice.show{display:block}
-    .notice.ok{background:rgba(46,125,50,.12);border-color:rgba(46,125,50,.20)}
-    .notice.err{background:rgba(255,150,150,.18);border-color:rgba(190,0,0,.18)}
-    .badge{
-      display:inline-flex;align-items:center;gap:8px;font-size:12px;
-      padding:6px 10px;border-radius:999px;border:1px solid rgba(0,0,0,.06);
-      background:rgba(255,255,255,.65)
+    .banner.show{display:block}
+    .banner.err{background: rgba(255,150,150,.18); border-color: rgba(190,0,0,.20);}
+    .banner.ok{background: rgba(180,255,180,.14); border-color: rgba(0,120,0,.18);}
+    .chip{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.7);
     }
   </style>
 </head>
@@ -69,19 +76,19 @@
     <div class="top">
       <div>
         <h1>HODOS Admin</h1>
-        <div class="sub">Quests, releases, and asset jobs queue (AUTH BYPASS MODE)</div>
+        <div class="sub">Quests, releases, and asset jobs queue <span class="chip">AUTH BYPASS MODE</span></div>
       </div>
       <div class="row">
-        <span class="pill warn" id="modePill">🔓 Auth bypass enabled</span>
+        <span class="pill" id="who">🔓 Auth bypass enabled</span>
         <button class="btn primary" id="reloadBtn">Reload</button>
-        <button class="btn danger" id="hardResetBtn" title="Clears UI state only (not server)">Clear UI</button>
+        <button class="btn danger" id="clearBtn">Clear UI</button>
       </div>
     </div>
 
-    <div class="notice" id="notice"></div>
+    <div class="banner" id="banner"></div>
 
     <div class="grid">
-      <!-- LEFT: Quests -->
+      <!-- LEFT: QUESTS -->
       <div class="card">
         <div class="row" style="justify-content:space-between;">
           <div class="pill">Quests</div>
@@ -95,15 +102,14 @@
 
         <div class="hr"></div>
 
-        <div id="questState" class="muted">No data loaded yet.</div>
-
-        <div class="tip">
-          Tip: “Hero Image” should be a site path like
-          <span class="badge"><code>assets/quests/returning_light.jpg</code></span>.
-          Your quest tiles (public pages) can read this and render real scenes per <code>quest_code</code>.
+        <div class="mini muted" style="margin-bottom:10px;">
+          Tip: set <b>Hero Image</b> to a site path like <span class="chip">assets/quests/returning_light.jpg</span>.
+          Your public pages can render real scenes per <code>quest_code</code>.
         </div>
 
-        <div style="overflow:auto;margin-top:10px;">
+        <div id="questState" class="muted">No data loaded yet.</div>
+
+        <div style="overflow:auto;">
           <table id="questTable" style="display:none;">
             <thead>
               <tr>
@@ -120,28 +126,37 @@
         </div>
       </div>
 
-      <!-- RIGHT: Jobs -->
+      <!-- RIGHT: JOBS -->
       <div class="card">
         <div class="row" style="justify-content:space-between;">
           <div class="pill">Asset Jobs</div>
-          <div class="row">
-            <select id="jobStatus" style="max-width:220px;">
-              <option value="active">active</option>
-              <option value="queued">queued</option>
-              <option value="in_progress">in_progress</option>
-              <option value="done">done</option>
-              <option value="failed">failed</option>
-              <option value="all">all</option>
-            </select>
-            <button class="btn" id="loadJobsBtn">Load jobs</button>
+          <div class="row" style="justify-content:flex-end;">
+            <label class="mini muted" style="display:flex;gap:8px;align-items:center;">
+              <input id="useCookies" type="checkbox" style="width:auto;" />
+              Use cookies (later OAuth)
+            </label>
           </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row" style="justify-content:space-between;">
+          <select id="jobStatus" style="max-width:220px;">
+            <option value="active">active</option>
+            <option value="queued">queued</option>
+            <option value="in_progress">in_progress</option>
+            <option value="done">done</option>
+            <option value="failed">failed</option>
+            <option value="all">all</option>
+          </select>
+          <button class="btn" id="loadJobsBtn">Load jobs</button>
         </div>
 
         <div class="hr"></div>
 
         <div id="jobState" class="muted">No jobs loaded yet.</div>
 
-        <div style="overflow:auto; max-height:520px;margin-top:10px;">
+        <div style="overflow:auto; max-height:520px;">
           <table id="jobTable" style="display:none;">
             <thead>
               <tr>
@@ -156,51 +171,43 @@
           </table>
         </div>
 
-        <div class="tip">
-          If your API returns JSON like <code>{ ok:false, error:"Server config error", correlation_id:"..." }</code>,
-          paste the <code>correlation_id</code> into your server logs lookup so you can find the exact fatal path/line.
+        <div class="hr"></div>
+        <div class="mini muted">
+          If you see <b>CORS error</b> in DevTools but the network row says <b>200 OK</b>, your endpoint is returning
+          without <span class="chip">Access-Control-Allow-Origin</span> (or you used cookies without
+          <span class="chip">Access-Control-Allow-Credentials: true</span>).
         </div>
       </div>
     </div>
   </div>
 
 <script>
-  // =========================
-  // CONFIG (AUTH BYPASS MODE)
-  // =========================
-  // Admin endpoints (write actions)
-  const ADMIN_BASE = "https://smashpro.app/api/v1/admin";
+  /* -----------------------------
+     CONFIG (AUTH BYPASS MODE)
+  ------------------------------ */
 
-  // Public quests endpoint (read-only fallback)
-  const PUBLIC_QUESTS = "https://smashpro.app/api/public/quest/index.php";
+  // IMPORTANT: keep consistent with your live server folders.
+  const API_BASE_ADMIN = "https://smashpro.app/api/v1/admin";
+  const API_BASE_PUBLIC = "https://smashpro.app/api/public";
 
-  // Toggle which list endpoint to use first:
-  // - true: try ADMIN list first, fall back to PUBLIC if it errors
-  // - false: use PUBLIC list only
-  const TRY_ADMIN_LIST_FIRST = true;
-
-  // Endpoints
   const EP = {
-    // read
-    questsListAdmin: `${ADMIN_BASE}/quests/list.php`,
-    questsListPublic: `${PUBLIC_QUESTS}`,
+    // Admin (bypass mode)
+    questsList:   `${API_BASE_ADMIN}/quests/list.php`,
+    questsUpdate: `${API_BASE_ADMIN}/quests/update.php`,
+    jobsList:     `${API_BASE_ADMIN}/jobs/list.php`,
+    jobsCreate:   `${API_BASE_ADMIN}/jobs/create.php`,
+    promptsQuestTile: `${API_BASE_ADMIN}/prompts/quest_tile.php`,
 
-    jobsList: `${ADMIN_BASE}/jobs/list.php`,
-
-    // write
-    questsUpdate: `${ADMIN_BASE}/quests/update.php`,
-    jobsCreate: `${ADMIN_BASE}/jobs/create.php`,
-
-    // prompt endpoint (optional; UI has local fallback)
-    promptsQuestTile: `${ADMIN_BASE}/prompts/quest_tile.php`,
+    // Public check (handy for sanity)
+    publicQuestIndex: `${API_BASE_PUBLIC}/quest/index.php`,
   };
 
-  // =========================
-  // UI refs
-  // =========================
-  const notice = document.getElementById("notice");
+  /* -----------------------------
+     UI refs
+  ------------------------------ */
+  const banner = document.getElementById("banner");
   const reloadBtn = document.getElementById("reloadBtn");
-  const hardResetBtn = document.getElementById("hardResetBtn");
+  const clearBtn = document.getElementById("clearBtn");
 
   const appSlug = document.getElementById("appSlug");
   const loadQuestsBtn = document.getElementById("loadQuestsBtn");
@@ -208,87 +215,98 @@
   const questTable = document.getElementById("questTable");
   const questTbody = document.getElementById("questTbody");
 
+  const useCookies = document.getElementById("useCookies");
   const jobStatus = document.getElementById("jobStatus");
   const loadJobsBtn = document.getElementById("loadJobsBtn");
   const jobState = document.getElementById("jobState");
   const jobTable = document.getElementById("jobTable");
   const jobTbody = document.getElementById("jobTbody");
 
-  // =========================
-  // Helpers
-  // =========================
   function esc(s){
     return String(s ?? "").replace(/[&<>"]/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
   }
 
-  function setNotice(type, msg){
-    notice.className = "notice show " + (type === "ok" ? "ok" : "err");
-    notice.textContent = msg || "";
-  }
-  function clearNotice(){
-    notice.className = "notice";
-    notice.textContent = "";
+  function cid(){
+    // cheap correlation id for browser-side tracing
+    return (crypto?.randomUUID?.() || (Date.now()+"-"+Math.random().toString(16).slice(2)));
   }
 
-  async function safeRead(res){
-    const ct = (res.headers.get("content-type") || "").toLowerCase();
-    if (ct.includes("application/json")) {
-      return await res.json().catch(() => ({}));
-    }
-    const t = await res.text().catch(() => "");
-    return { _text: t };
+  function showBanner(type, msg){
+    banner.className = "banner show " + (type === "ok" ? "ok" : "err");
+    banner.textContent = msg || "";
+  }
+  function clearBanner(){
+    banner.className = "banner";
+    banner.textContent = "";
   }
 
-  // AUTH BYPASS: no cookies required
-  async function jget(url){
-    const r = await fetch(url, {
+  async function safeJson(res){
+    const ct = (res.headers.get("content-type")||"").toLowerCase();
+    if (ct.includes("application/json")) return await res.json().catch(()=> ({}));
+    const text = await res.text().catch(()=> "");
+    return { _text: text };
+  }
+
+  async function apiGet(url){
+    const corr = cid();
+    const opts = {
       method: "GET",
-      headers: { "Accept":"application/json" },
-      cache: "no-store",
-    });
-    const data = await safeRead(r);
-    if (!r.ok || data.ok === false) {
-      const cid = data.correlation_id ? `\ncorrelation_id: ${data.correlation_id}` : "";
-      throw new Error((data.error || data.message || `HTTP ${r.status}`) + cid);
+      mode: "cors",
+      credentials: useCookies.checked ? "include" : "omit",
+      headers: {
+        "Accept": "application/json",
+        "X-Correlation-Id": corr,
+      }
+    };
+
+    try{
+      const res = await fetch(url, opts);
+      const data = await safeJson(res);
+
+      if (!res.ok || data.ok === false){
+        const msg = data.error || data.message || data._text || `HTTP ${res.status}`;
+        throw new Error(`${msg}\n(correlation: ${data.correlation_id || corr})`);
+      }
+      return data;
+    }catch(err){
+      // When CORS blocks, fetch throws TypeError: Failed to fetch with no body access.
+      const emsg = (err && err.message) ? err.message : String(err);
+      throw new Error(`${emsg}\n\nIf this is a CORS block, fix server headers for origin:\n${location.origin}\n`);
     }
-    return data;
   }
 
-  async function jpost(url, body){
-    const r = await fetch(url, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
-      body: JSON.stringify(body || {}),
-    });
-    const data = await safeRead(r);
-    if (!r.ok || data.ok === false) {
-      const cid = data.correlation_id ? `\ncorrelation_id: ${data.correlation_id}` : "";
-      throw new Error((data.error || data.message || `HTTP ${r.status}`) + cid);
+  async function apiPost(url, body){
+    const corr = cid();
+    const opts = {
+      method: "POST",
+      mode: "cors",
+      credentials: useCookies.checked ? "include" : "omit",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-Correlation-Id": corr,
+      },
+      body: JSON.stringify(body || {})
+    };
+
+    try{
+      const res = await fetch(url, opts);
+      const data = await safeJson(res);
+
+      if (!res.ok || data.ok === false){
+        const msg = data.error || data.message || data._text || `HTTP ${res.status}`;
+        throw new Error(`${msg}\n(correlation: ${data.correlation_id || corr})`);
+      }
+      return data;
+    }catch(err){
+      const emsg = (err && err.message) ? err.message : String(err);
+      throw new Error(`${emsg}\n\nIf this is a CORS block, fix server headers for origin:\n${location.origin}\n`);
     }
-    return data;
   }
 
-  // Local prompt fallback (keeps you moving even if prompt endpoint is down)
-  function localQuestTilePrompt({ quest_code, title }){
-    const safeTitle = title || quest_code || "HODOS Quest";
-    const code = quest_code || "quest_code_here";
-
-    const prompt =
-`HODOS app quest tile art (single image).
-Title: "${safeTitle}"
-Quest code: "${code}"
-
-Style: cinematic fantasy illustration, warm gold + clay palette, ancient mythic atmosphere, soft volumetric light, high detail, painterly realism, subtle UI-safe composition (leave space at top-left for difficulty pill and bottom-right for lock icon).
-Subject: a symbolic scene that visually represents "${safeTitle}" without text.
-
-Output: 1024x1024 PNG, no text, no watermark, no logo.`;
-
-    const negative =
-`text, watermark, logo, frame text, blurry, low-res, jpeg artifacts, deformed anatomy, extra limbs, gore, explicit nudity, hateful symbols`;
-
-    return { prompt, negative_prompt: negative };
-  }
-
+  /* -----------------------------
+     Renderers
+  ------------------------------ */
   function questRow(q){
     const published = (q.is_published == 1 || q.is_published === true) ? "1" : "0";
     const rel = q.target_release_date || "";
@@ -304,7 +322,7 @@ Output: 1024x1024 PNG, no text, no watermark, no logo.`;
           </select>
         </td>
         <td><input data-k="target_release_date" placeholder="YYYY-MM-DD" value="${esc(rel)}" /></td>
-        <td><input data-k="hero_image" placeholder="assets/quests/${esc(q.code||"quest_code")}.jpg" value="${esc(hero)}" /></td>
+        <td><input data-k="hero_image" placeholder="assets/quests/<code>.jpg" value="${esc(hero)}" /></td>
         <td>
           <div class="row">
             <button class="btn" data-action="save">Save</button>
@@ -316,32 +334,17 @@ Output: 1024x1024 PNG, no text, no watermark, no logo.`;
     `;
   }
 
+  /* -----------------------------
+     Loaders
+  ------------------------------ */
   async function loadQuests(){
-    clearNotice();
+    clearBanner();
     questState.textContent = "Loading quests…";
     questTable.style.display = "none";
     questTbody.innerHTML = "";
 
-    const slug = encodeURIComponent(appSlug.value);
-
-    let data = null;
-    let used = "";
-
-    if (TRY_ADMIN_LIST_FIRST) {
-      try {
-        data = await jget(`${EP.questsListAdmin}?app_slug=${slug}`);
-        used = "admin";
-      } catch (e) {
-        // fall back to public
-        data = await jget(`${EP.questsListPublic}?app_slug=${slug}`);
-        used = "public";
-        setNotice("ok", `Loaded quests via PUBLIC endpoint (admin list failed).\n${e.message}`);
-      }
-    } else {
-      data = await jget(`${EP.questsListPublic}?app_slug=${slug}`);
-      used = "public";
-    }
-
+    const url = `${EP.questsList}?app_slug=${encodeURIComponent(appSlug.value)}`;
+    const data = await apiGet(url);
     const quests = Array.isArray(data.quests) ? data.quests : [];
 
     if (!quests.length){
@@ -349,28 +352,27 @@ Output: 1024x1024 PNG, no text, no watermark, no logo.`;
       return;
     }
 
-    questState.innerHTML = `Loaded <strong>${quests.length}</strong> quests (${used}).`;
+    questState.textContent = "";
     questTable.style.display = "";
     questTbody.innerHTML = quests.map(questRow).join("");
   }
 
   async function loadJobs(){
-    clearNotice();
+    clearBanner();
     jobState.textContent = "Loading jobs…";
     jobTable.style.display = "none";
     jobTbody.innerHTML = "";
 
-    const url =
-      `${EP.jobsList}?app_slug=${encodeURIComponent(appSlug.value)}&status=${encodeURIComponent(jobStatus.value)}`;
-
-    const data = await jget(url);
+    const url = `${EP.jobsList}?app_slug=${encodeURIComponent(appSlug.value)}&status=${encodeURIComponent(jobStatus.value)}`;
+    const data = await apiGet(url);
     const jobs = Array.isArray(data.jobs) ? data.jobs : [];
 
     if (!jobs.length){
       jobState.textContent = "No jobs found for this filter.";
       return;
     }
-    jobState.innerHTML = `Loaded <strong>${jobs.length}</strong> jobs.`;
+
+    jobState.textContent = "";
     jobTable.style.display = "";
     jobTbody.innerHTML = jobs.map(j => `
       <tr>
@@ -378,12 +380,14 @@ Output: 1024x1024 PNG, no text, no watermark, no logo.`;
         <td><code>${esc(j.quest_code)}</code></td>
         <td>${esc(j.job_type)}</td>
         <td>${esc(j.status)}</td>
-        <td class="muted">${esc((j.prompt||"").slice(0,120))}${(j.prompt||"").length>120?"…":""}</td>
+        <td class="muted">${esc((j.prompt||"").slice(0,140))}${(j.prompt||"").length>140?"…":""}</td>
       </tr>
     `).join("");
   }
 
-  // Delegated actions for quest table
+  /* -----------------------------
+     Actions
+  ------------------------------ */
   questTbody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
@@ -399,83 +403,87 @@ Output: 1024x1024 PNG, no text, no watermark, no logo.`;
     tr.querySelectorAll("[data-k]").forEach(el => fields[el.dataset.k] = el.value);
 
     try {
+      clearBanner();
       btn.disabled = true;
 
       if (action === "save") {
-        await jpost(EP.questsUpdate, { id, ...fields });
+        await apiPost(EP.questsUpdate, { id, ...fields });
         btn.textContent = "Saved ✅";
         setTimeout(()=>btn.textContent="Save", 900);
+        showBanner("ok", `Saved quest: ${code}`);
       }
 
       if (action === "prompt") {
-        // Try server prompt endpoint first; fallback local prompt
-        let pr = null;
-        try {
-          pr = await jpost(EP.promptsQuestTile, { quest_code: code, title: fields.title || "" });
-        } catch (err) {
-          pr = localQuestTilePrompt({ quest_code: code, title: fields.title || "" });
-          setNotice("ok", `Prompt endpoint failed, using LOCAL prompt generator.\n${err.message}`);
-        }
-        window.prompt("Quest Tile Prompt (copy):", pr.prompt || "");
+        const promptRes = await apiPost(EP.promptsQuestTile, {
+          quest_code: code,
+          title: fields.title || ""
+        });
+        window.prompt("Quest Tile Prompt (copy):", promptRes.prompt || "");
       }
 
       if (action === "queue") {
-        // Build prompt (server -> fallback local)
-        let pr = null;
-        try {
-          pr = await jpost(EP.promptsQuestTile, { quest_code: code, title: fields.title || "" });
-        } catch (err) {
-          pr = localQuestTilePrompt({ quest_code: code, title: fields.title || "" });
-          setNotice("ok", `Prompt endpoint failed, using LOCAL prompt generator.\n${err.message}`);
-        }
+        const promptRes = await apiPost(EP.promptsQuestTile, {
+          quest_code: code,
+          title: fields.title || ""
+        });
 
-        await jpost(EP.jobsCreate, {
+        await apiPost(EP.jobsCreate, {
           app_slug: appSlug.value,
           quest_code: code,
           job_type: "quest_tile",
           priority: 50,
-          prompt: pr.prompt,
-          negative_prompt: pr.negative_prompt
+          prompt: promptRes.prompt,
+          negative_prompt: promptRes.negative_prompt
         });
 
         btn.textContent = "Queued ✅";
         setTimeout(()=>btn.textContent="Queue Tile Job", 900);
+        showBanner("ok", `Queued job for quest: ${code}`);
         await loadJobs();
       }
     } catch (err) {
       console.error(err);
-      setNotice("err", err?.message || "Action failed");
+      showBanner("err", err?.message || "Action failed");
       alert(err?.message || "Action failed");
     } finally {
       btn.disabled = false;
     }
   });
 
-  // Buttons
-  loadQuestsBtn.addEventListener("click", () => loadQuests().catch(err => setNotice("err", err.message)));
-  loadJobsBtn.addEventListener("click", () => loadJobs().catch(err => setNotice("err", err.message)));
+  /* -----------------------------
+     Buttons
+  ------------------------------ */
+  loadQuestsBtn.addEventListener("click", () => loadQuests().catch(err => showBanner("err", err.message)));
+  loadJobsBtn.addEventListener("click", () => loadJobs().catch(err => showBanner("err", err.message)));
 
   reloadBtn.addEventListener("click", async () => {
-    clearNotice();
-    await loadQuests().catch(err => setNotice("err", err.message));
-    await loadJobs().catch(err => setNotice("err", err.message));
+    try{
+      clearBanner();
+      await loadQuests();
+      await loadJobs();
+    }catch(err){
+      showBanner("err", err?.message || "Reload failed");
+    }
   });
 
-  hardResetBtn.addEventListener("click", () => {
-    clearNotice();
+  clearBtn.addEventListener("click", () => {
+    clearBanner();
     questState.textContent = "No data loaded yet.";
-    jobState.textContent = "No jobs loaded yet.";
     questTable.style.display = "none";
-    jobTable.style.display = "none";
     questTbody.innerHTML = "";
+    jobState.textContent = "No jobs loaded yet.";
+    jobTable.style.display = "none";
     jobTbody.innerHTML = "";
   });
 
-  // Boot
+  /* -----------------------------
+     Boot
+  ------------------------------ */
   (async () => {
-    await loadQuests().catch(err => setNotice("err", err.message));
-    await loadJobs().catch(err => setNotice("err", err.message));
+    // Don’t auto-load on first paint to avoid confusing “Failed to fetch” before server is fixed.
+    // Click Reload when ready.
   })();
 </script>
+
 </body>
 </html>
