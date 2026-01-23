@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HODOS Admin — Quests & Assets</title>
-  <meta name="description" content="HODOS Admin: quests, releases, and asset jobs queue (GitHub-authenticated)." />
+  <meta name="description" content="HODOS Admin tool for quests and asset job queue." />
 
   <style>
     :root{
@@ -13,37 +13,25 @@
       --shadow: 0 16px 40px rgba(0,0,0,.12); --r: 18px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       --serif: ui-serif, Georgia, "Times New Roman", Times, serif;
+      --ok:#1b5e20; --err:#8b0000;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
-      background:
-        radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
-        radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
-        linear-gradient(180deg,var(--bg2),var(--bg));
+      background: radial-gradient(1200px 700px at 15% 0%, rgba(197,138,44,.16), transparent 55%),
+                  radial-gradient(900px 600px at 85% 10%, rgba(247,210,122,.18), transparent 60%),
+                  linear-gradient(180deg,var(--bg2),var(--bg));
       min-height:100vh;
     }
-    .wrap{max-width:1200px;margin:0 auto;padding:34px 16px 60px}
+    .wrap{max-width:1250px;margin:0 auto;padding:34px 16px 60px}
     .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
     h1{margin:0;font-family:var(--serif);color:var(--gold-dark);letter-spacing:.2px}
+    .sub{font-size:12px;color:rgba(58,36,15,.78);margin-top:4px}
     .card{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{
-      border:1px solid rgba(197,138,44,.32);
-      background:rgba(255,255,255,.75);
-      border-radius:999px;
-      padding:10px 12px;
-      font-weight:800;
-      cursor:pointer;
-      transition: transform .12s ease, box-shadow .12s ease;
-      user-select:none;
-    }
-    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.10); }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+    .btn{border:1px solid rgba(197,138,44,.32);background:rgba(255,255,255,.75);border-radius:999px;padding:10px 12px;font-weight:800;cursor:pointer}
     .btn.primary{background:radial-gradient(circle at top,var(--gold2),var(--gold));color:#3A240F}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;
-      border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800
-    }
+    .btn.danger{border-color: rgba(190,0,0,.25); background: rgba(255,150,150,.15); color:#3A240F;}
+    .pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 10px;border:1px solid rgba(197,138,44,.22);background:rgba(232,214,184,.65);font-weight:800}
     .grid{display:grid;grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px}
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     table{width:100%;border-collapse:collapse}
@@ -57,36 +45,47 @@
     @media(max-width:720px){.two{grid-template-columns:1fr}}
     .hr{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:12px 0}
     .mini{font-size:12px;color:rgba(58,36,15,.78)}
-    .ok{color:#1b5e20;font-weight:900}
-    .err{color:#8b0000;font-weight:900}
-    .tip{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(197,138,44,.18);
-      background: rgba(255,255,255,.70);
-      font-size:13px;
-      color: rgba(58,36,15,.88);
-      line-height:1.45;
+    .ok{color:var(--ok);font-weight:900}
+    .err{color:var(--err);font-weight:900}
+    .banner{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(197,138,44,.20);
+      background: rgba(232,214,184,.45);
+      color:#3A240F;
+      display:none;
+      white-space:pre-wrap;
     }
-    .kbd{font-family:var(--mono);font-size:12px;background:rgba(232,214,184,.55);border:1px solid rgba(197,138,44,.18);padding:2px 6px;border-radius:8px}
-    .rightcol-note{margin-top:10px}
+    .banner.show{display:block}
+    .banner.err{background: rgba(255,150,150,.18); border-color: rgba(190,0,0,.20);}
+    .banner.ok{background: rgba(180,255,180,.14); border-color: rgba(0,120,0,.18);}
+    .chip{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.7);
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
       <div>
         <h1>HODOS Admin</h1>
-        <div class="mini">Quests, releases, and asset jobs queue (GitHub-authenticated)</div>
+        <div class="sub">Quests, releases, and asset jobs queue <span class="chip">AUTH BYPASS MODE</span></div>
       </div>
       <div class="row">
-        <span class="pill" id="who">Checking session…</span>
-        <button class="btn" id="loginBtn" type="button">Login with GitHub</button>
-        <button class="btn" id="logoutBtn" type="button">Logout</button>
-        <button class="btn primary" id="reloadBtn" type="button">Reload</button>
+        <span class="pill" id="who">🔓 Auth bypass enabled</span>
+        <button class="btn primary" id="reloadBtn">Reload</button>
+        <button class="btn danger" id="clearBtn">Clear UI</button>
       </div>
     </div>
+
+    <div class="banner" id="banner"></div>
 
     <div class="grid">
       <!-- LEFT: QUESTS -->
@@ -97,20 +96,20 @@
             <select id="appSlug" style="max-width:220px;">
               <option value="hodos">hodos</option>
             </select>
-            <button class="btn" id="loadQuestsBtn" type="button">Load quests</button>
+            <button class="btn" id="loadQuestsBtn">Load quests</button>
           </div>
         </div>
 
         <div class="hr"></div>
 
-        <div id="questState" class="muted">No data loaded yet.</div>
-
-        <div class="tip">
-          Tip: <span class="kbd">Hero Image</span> should be a site path like
-          <span class="kbd">assets/quests/returning_light.jpg</span>. Your public quest tiles can read this and render a real scene per <span class="kbd">quest_code</span>.
+        <div class="mini muted" style="margin-bottom:10px;">
+          Tip: set <b>Hero Image</b> to a site path like <span class="chip">assets/quests/returning_light.jpg</span>.
+          Your public pages can render real scenes per <code>quest_code</code>.
         </div>
 
-        <div style="overflow:auto; margin-top:10px;">
+        <div id="questState" class="muted">No data loaded yet.</div>
+
+        <div style="overflow:auto;">
           <table id="questTable" style="display:none;">
             <thead>
               <tr>
@@ -131,30 +130,33 @@
       <div class="card">
         <div class="row" style="justify-content:space-between;">
           <div class="pill">Asset Jobs</div>
-          <div class="row">
-            <select id="jobStatus" style="max-width:220px;">
-              <option value="active">active</option>
-              <option value="queued">queued</option>
-              <option value="in_progress">in_progress</option>
-              <option value="done">done</option>
-              <option value="failed">failed</option>
-              <option value="all">all</option>
-            </select>
-            <button class="btn" id="loadJobsBtn" type="button">Load jobs</button>
+          <div class="row" style="justify-content:flex-end;">
+            <label class="mini muted" style="display:flex;gap:8px;align-items:center;">
+              <input id="useCookies" type="checkbox" style="width:auto;" />
+              Use cookies (later OAuth)
+            </label>
           </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row" style="justify-content:space-between;">
+          <select id="jobStatus" style="max-width:220px;">
+            <option value="active">active</option>
+            <option value="queued">queued</option>
+            <option value="in_progress">in_progress</option>
+            <option value="done">done</option>
+            <option value="failed">failed</option>
+            <option value="all">all</option>
+          </select>
+          <button class="btn" id="loadJobsBtn">Load jobs</button>
         </div>
 
         <div class="hr"></div>
 
         <div id="jobState" class="muted">No jobs loaded yet.</div>
 
-        <div class="tip rightcol-note">
-          Note: If DevTools shows <span class="kbd">CORS error</span> but your server logs show HTTP 200,
-          your API likely isn’t returning <span class="kbd">Access-Control-Allow-Origin</span> and
-          <span class="kbd">Access-Control-Allow-Credentials</span> for credentialed requests.
-        </div>
-
-        <div style="overflow:auto; max-height:520px; margin-top:10px;">
+        <div style="overflow:auto; max-height:520px;">
           <table id="jobTable" style="display:none;">
             <thead>
               <tr>
@@ -168,33 +170,44 @@
             <tbody id="jobTbody"></tbody>
           </table>
         </div>
+
+        <div class="hr"></div>
+        <div class="mini muted">
+          If you see <b>CORS error</b> in DevTools but the network row says <b>200 OK</b>, your endpoint is returning
+          without <span class="chip">Access-Control-Allow-Origin</span> (or you used cookies without
+          <span class="chip">Access-Control-Allow-Credentials: true</span>).
+        </div>
       </div>
     </div>
   </div>
 
 <script>
-  // ---------- CONFIG ----------
-  const API_BASE = "https://smashpro.app/api/v1/admin";
+  /* -----------------------------
+     CONFIG (AUTH BYPASS MODE)
+  ------------------------------ */
+
+  // IMPORTANT: keep consistent with your live server folders.
+  const API_BASE_ADMIN = "https://smashpro.app/api/hodos/v1/admin";
+  const API_BASE_PUBLIC = "https://smashpro.app/api/hodos/public";
 
   const EP = {
-    startAuth: `${API_BASE}/github/start.php`,
-    sessionGet: `${API_BASE}/session/get.php`,
-    logout: `${API_BASE}/session/logout.php`,
+    // Admin (bypass mode)
+    questsList:   `${API_BASE_ADMIN}/quests/list.php`,
+    questsUpdate: `${API_BASE_ADMIN}/quests/update.php`,
+    jobsList:     `${API_BASE_ADMIN}/jobs/list.php`,
+    jobsCreate:   `${API_BASE_ADMIN}/jobs/create.php`,
+    promptsQuestTile: `${API_BASE_ADMIN}/prompts/quest_tile.php`,
 
-    questsList: `${API_BASE}/quests/list.php`,
-    questsUpdate: `${API_BASE}/quests/update.php`,
-
-    jobsList: `${API_BASE}/jobs/list.php`,
-    jobsCreate: `${API_BASE}/jobs/create.php`,
-
-    promptsQuestTile: `${API_BASE}/prompts/quest_tile.php`,
+    // Public check (handy for sanity)
+    publicQuestIndex: `${API_BASE_PUBLIC}/quest/index.php`,
   };
 
-  // ---------- UI ----------
-  const who = document.getElementById("who");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+  /* -----------------------------
+     UI refs
+  ------------------------------ */
+  const banner = document.getElementById("banner");
   const reloadBtn = document.getElementById("reloadBtn");
+  const clearBtn = document.getElementById("clearBtn");
 
   const appSlug = document.getElementById("appSlug");
   const loadQuestsBtn = document.getElementById("loadQuestsBtn");
@@ -202,113 +215,102 @@
   const questTable = document.getElementById("questTable");
   const questTbody = document.getElementById("questTbody");
 
+  const useCookies = document.getElementById("useCookies");
   const jobStatus = document.getElementById("jobStatus");
   const loadJobsBtn = document.getElementById("loadJobsBtn");
   const jobState = document.getElementById("jobState");
   const jobTable = document.getElementById("jobTable");
   const jobTbody = document.getElementById("jobTbody");
 
-  let SESSION = null;
-
   function esc(s){
-    return String(s ?? "").replace(/[&<>"]/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"
-    }[c]));
+    return String(s ?? "").replace(/[&<>"]/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
   }
 
-  // Better error text for CORS / network failures
-  function explainFetchError(err){
-    const msg = String(err?.message || err || "");
-    // Most browsers throw TypeError: Failed to fetch for CORS/network
-    if (/Failed to fetch/i.test(msg) || /NetworkError/i.test(msg)) {
-      return [
-        "Request failed (network/CORS).",
-        "If this is GitHub Pages → smashpro.app, make sure your API returns:",
-        "  - Access-Control-Allow-Origin: https://smashpro-digital.github.io",
-        "  - Access-Control-Allow-Credentials: true",
-        "and does NOT use '*' when credentials are included."
-      ].join("\n");
-    }
-    return msg || "Request failed.";
+  function cid(){
+    // cheap correlation id for browser-side tracing
+    return (crypto?.randomUUID?.() || (Date.now()+"-"+Math.random().toString(16).slice(2)));
   }
 
-  async function safeParse(res){
-    const ct = (res.headers.get("content-type") || "").toLowerCase();
-    if (ct.includes("application/json")) return await res.json().catch(() => ({}));
-    const text = await res.text().catch(() => "");
+  function showBanner(type, msg){
+    banner.className = "banner show " + (type === "ok" ? "ok" : "err");
+    banner.textContent = msg || "";
+  }
+  function clearBanner(){
+    banner.className = "banner";
+    banner.textContent = "";
+  }
+
+  async function safeJson(res){
+    const ct = (res.headers.get("content-type")||"").toLowerCase();
+    if (ct.includes("application/json")) return await res.json().catch(()=> ({}));
+    const text = await res.text().catch(()=> "");
     return { _text: text };
   }
 
-  async function jget(url){
-    let r;
-    try {
-      r = await fetch(url, { credentials: "include" });
-    } catch (err) {
-      throw new Error(explainFetchError(err));
-    }
-    const data = await safeParse(r);
+  async function apiGet(url){
+    const corr = cid();
+    const opts = {
+      method: "GET",
+      mode: "cors",
+      credentials: useCookies.checked ? "include" : "omit",
+      headers: {
+        "Accept": "application/json",
+        "X-Correlation-Id": corr,
+      }
+    };
 
-    if (!r.ok || data.ok === false) {
-      const msg = data.error || data.message || (data._text ? String(data._text).slice(0,180) : "") || `HTTP ${r.status}`;
-      throw new Error(msg);
-    }
-    return data;
-  }
+    try{
+      const res = await fetch(url, opts);
+      const data = await safeJson(res);
 
-  async function jpost(url, body){
-    let r;
-    try {
-      r = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(body || {})
-      });
-    } catch (err) {
-      throw new Error(explainFetchError(err));
-    }
-    const data = await safeParse(r);
-
-    if (!r.ok || data.ok === false) {
-      const msg = data.error || data.message || (data._text ? String(data._text).slice(0,180) : "") || `HTTP ${r.status}`;
-      throw new Error(msg);
-    }
-    return data;
-  }
-
-  async function refreshSession(){
-    const s = await jget(EP.sessionGet);
-    SESSION = s.authenticated ? (s.admin || null) : null;
-
-    if (SESSION) {
-      who.innerHTML = `✅ <strong>${esc(SESSION.login || "admin")}</strong>`;
-      who.className = "pill ok";
-      loginBtn.disabled = true;
-      logoutBtn.disabled = false;
-    } else {
-      who.textContent = "Not logged in";
-      who.className = "pill muted";
-      loginBtn.disabled = false;
-      logoutBtn.disabled = true;
+      if (!res.ok || data.ok === false){
+        const msg = data.error || data.message || data._text || `HTTP ${res.status}`;
+        throw new Error(`${msg}\n(correlation: ${data.correlation_id || corr})`);
+      }
+      return data;
+    }catch(err){
+      // When CORS blocks, fetch throws TypeError: Failed to fetch with no body access.
+      const emsg = (err && err.message) ? err.message : String(err);
+      throw new Error(`${emsg}\n\nIf this is a CORS block, fix server headers for origin:\n${location.origin}\n`);
     }
   }
 
-  async function login(){
-    const r = await jget(EP.startAuth);
-    if (!r.auth_url) throw new Error("Missing auth_url from start.php");
-    location.href = r.auth_url; // GitHub OAuth redirect
+  async function apiPost(url, body){
+    const corr = cid();
+    const opts = {
+      method: "POST",
+      mode: "cors",
+      credentials: useCookies.checked ? "include" : "omit",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-Correlation-Id": corr,
+      },
+      body: JSON.stringify(body || {})
+    };
+
+    try{
+      const res = await fetch(url, opts);
+      const data = await safeJson(res);
+
+      if (!res.ok || data.ok === false){
+        const msg = data.error || data.message || data._text || `HTTP ${res.status}`;
+        throw new Error(`${msg}\n(correlation: ${data.correlation_id || corr})`);
+      }
+      return data;
+    }catch(err){
+      const emsg = (err && err.message) ? err.message : String(err);
+      throw new Error(`${emsg}\n\nIf this is a CORS block, fix server headers for origin:\n${location.origin}\n`);
+    }
   }
 
-  async function logout(){
-    await jget(EP.logout);
-    await refreshSession();
-  }
-
+  /* -----------------------------
+     Renderers
+  ------------------------------ */
   function questRow(q){
-    const published = (q.is_published == 1 || q.is_published === true || q.is_published === "1") ? "1" : "0";
+    const published = (q.is_published == 1 || q.is_published === true) ? "1" : "0";
     const rel = q.target_release_date || "";
     const hero = q.hero_image || "";
-
     return `
       <tr data-id="${esc(q.id)}" data-code="${esc(q.code)}">
         <td><code>${esc(q.code)}</code></td>
@@ -323,21 +325,26 @@
         <td><input data-k="hero_image" placeholder="assets/quests/<code>.jpg" value="${esc(hero)}" /></td>
         <td>
           <div class="row">
-            <button class="btn" data-action="save" type="button">Save</button>
-            <button class="btn" data-action="prompt" type="button">Gen Prompt</button>
-            <button class="btn primary" data-action="queue" type="button">Queue Tile Job</button>
+            <button class="btn" data-action="save">Save</button>
+            <button class="btn" data-action="prompt">Gen Prompt</button>
+            <button class="btn primary" data-action="queue">Queue Tile Job</button>
           </div>
         </td>
       </tr>
     `;
   }
 
+  /* -----------------------------
+     Loaders
+  ------------------------------ */
   async function loadQuests(){
+    clearBanner();
     questState.textContent = "Loading quests…";
     questTable.style.display = "none";
     questTbody.innerHTML = "";
 
-    const data = await jget(`${EP.questsList}?app_slug=${encodeURIComponent(appSlug.value)}`);
+    const url = `${EP.questsList}?app_slug=${encodeURIComponent(appSlug.value)}`;
+    const data = await apiGet(url);
     const quests = Array.isArray(data.quests) ? data.quests : [];
 
     if (!quests.length){
@@ -351,12 +358,13 @@
   }
 
   async function loadJobs(){
+    clearBanner();
     jobState.textContent = "Loading jobs…";
     jobTable.style.display = "none";
     jobTbody.innerHTML = "";
 
     const url = `${EP.jobsList}?app_slug=${encodeURIComponent(appSlug.value)}&status=${encodeURIComponent(jobStatus.value)}`;
-    const data = await jget(url);
+    const data = await apiGet(url);
     const jobs = Array.isArray(data.jobs) ? data.jobs : [];
 
     if (!jobs.length){
@@ -377,7 +385,9 @@
     `).join("");
   }
 
-  // Event delegation (quest actions)
+  /* -----------------------------
+     Actions
+  ------------------------------ */
   questTbody.addEventListener("click", async (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
@@ -392,18 +402,19 @@
     const fields = {};
     tr.querySelectorAll("[data-k]").forEach(el => fields[el.dataset.k] = el.value);
 
-    const originalText = btn.textContent;
     try {
+      clearBanner();
       btn.disabled = true;
 
       if (action === "save") {
-        await jpost(EP.questsUpdate, { id, ...fields });
+        await apiPost(EP.questsUpdate, { id, ...fields });
         btn.textContent = "Saved ✅";
-        setTimeout(() => (btn.textContent = originalText), 900);
+        setTimeout(()=>btn.textContent="Save", 900);
+        showBanner("ok", `Saved quest: ${code}`);
       }
 
       if (action === "prompt") {
-        const promptRes = await jpost(EP.promptsQuestTile, {
+        const promptRes = await apiPost(EP.promptsQuestTile, {
           quest_code: code,
           title: fields.title || ""
         });
@@ -411,12 +422,12 @@
       }
 
       if (action === "queue") {
-        const promptRes = await jpost(EP.promptsQuestTile, {
+        const promptRes = await apiPost(EP.promptsQuestTile, {
           quest_code: code,
           title: fields.title || ""
         });
 
-        await jpost(EP.jobsCreate, {
+        await apiPost(EP.jobsCreate, {
           app_slug: appSlug.value,
           quest_code: code,
           job_type: "quest_tile",
@@ -426,50 +437,53 @@
         });
 
         btn.textContent = "Queued ✅";
-        setTimeout(() => (btn.textContent = originalText), 900);
+        setTimeout(()=>btn.textContent="Queue Tile Job", 900);
+        showBanner("ok", `Queued job for quest: ${code}`);
         await loadJobs();
       }
     } catch (err) {
       console.error(err);
+      showBanner("err", err?.message || "Action failed");
       alert(err?.message || "Action failed");
     } finally {
       btn.disabled = false;
     }
   });
 
-  // Buttons
-  loginBtn.addEventListener("click", () => login().catch(err => alert(err.message)));
-  logoutBtn.addEventListener("click", () => logout().catch(err => alert(err.message)));
+  /* -----------------------------
+     Buttons
+  ------------------------------ */
+  loadQuestsBtn.addEventListener("click", () => loadQuests().catch(err => showBanner("err", err.message)));
+  loadJobsBtn.addEventListener("click", () => loadJobs().catch(err => showBanner("err", err.message)));
+
   reloadBtn.addEventListener("click", async () => {
-    try {
-      await refreshSession();
-      if (SESSION) {
-        await loadQuests();
-        await loadJobs();
-      }
-    } catch (err) {
-      alert(err?.message || "Reload failed");
+    try{
+      clearBanner();
+      await loadQuests();
+      await loadJobs();
+    }catch(err){
+      showBanner("err", err?.message || "Reload failed");
     }
   });
 
-  loadQuestsBtn.addEventListener("click", () => loadQuests().catch(err => alert(err.message)));
-  loadJobsBtn.addEventListener("click", () => loadJobs().catch(err => alert(err.message)));
+  clearBtn.addEventListener("click", () => {
+    clearBanner();
+    questState.textContent = "No data loaded yet.";
+    questTable.style.display = "none";
+    questTbody.innerHTML = "";
+    jobState.textContent = "No jobs loaded yet.";
+    jobTable.style.display = "none";
+    jobTbody.innerHTML = "";
+  });
 
-  // Boot
+  /* -----------------------------
+     Boot
+  ------------------------------ */
   (async () => {
-    try {
-      await refreshSession();
-      if (SESSION) {
-        await loadQuests();
-        await loadJobs();
-      }
-    } catch (err) {
-      console.error(err);
-      who.textContent = "Session check failed";
-      who.className = "pill err";
-      alert(err?.message || "Session check failed");
-    }
+    // Don’t auto-load on first paint to avoid confusing “Failed to fetch” before server is fixed.
+    // Click Reload when ready.
   })();
 </script>
+
 </body>
 </html>
